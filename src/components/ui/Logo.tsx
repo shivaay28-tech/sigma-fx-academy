@@ -3,6 +3,10 @@ import { APP_SHORT_NAME } from '@/utils/constants'
 import { cn } from '@/utils/cn'
 import { useId } from 'react'
 
+function usesWordmark(id: string) {
+  return id === 'baazex'
+}
+
 export function Logo({
   light = false,
   compact = false,
@@ -12,7 +16,7 @@ export function Logo({
   compact?: boolean
   className?: string
 }) {
-  if (BRAND.id === 'baazex') {
+  if (usesWordmark(BRAND.id)) {
     if (compact) {
       return <img src="/brand/logo-mark.png" alt="" className={cn('h-9 w-9 object-contain', className)} />
     }
