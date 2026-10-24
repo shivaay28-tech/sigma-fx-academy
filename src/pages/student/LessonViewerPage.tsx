@@ -5,13 +5,16 @@ import { Disclaimer } from '@/components/ui/Disclaimer'
 import { useAcademy } from '@/context/AcademyContext'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
+import { courseCover } from '@/data/media'
 import { catalogService } from '@/services/catalog'
 import { progressService } from '@/services/progress'
 import { APP_NAME } from '@/utils/constants'
+import { lessonNotesPdf } from '@/utils/lessonPdf'
+import { pageBackgroundStyle } from '@/utils/pageBackground'
 import { findLesson, getAdjacentLessons, getCourseLessons } from '@/utils/course'
 import { ChevronLeft, ChevronRight, Download, Menu, PanelLeftClose } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export function LessonViewerPage() {
   const { courseSlug, lessonSlug } = useParams()
@@ -20,6 +23,7 @@ export function LessonViewerPage() {
   const { completeLesson, enroll, isEnrolled, refresh } = useAcademy()
   const { push } = useToast()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [sidebar, setSidebar] = useState(true)
   const [mobileCurriculum, setMobileCurriculum] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -62,24 +66,27 @@ export function LessonViewerPage() {
   }
 
   function downloadResource() {
-    const blob = new Blob(
-      [`${APP_NAME} resource\n\n${activeLesson.title}\n\n${activeLesson.content.join('\n\n')}\n\nEducational use only.`],
-      { type: 'text/plain' },
-    )
+    const blob = lessonNotesPdf({
+      academy: APP_NAME,
+      courseTitle: activeCourse.title,
+      lessonTitle: activeLesson.title,
+      summary: activeLesson.summary,
+      paragraphs: activeLesson.content,
+    })
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
     anchor.href = url
-    anchor.download = `${activeLesson.slug}-notes.txt`
+    anchor.download = `${activeLesson.slug}-notes.pdf`
     anchor.click()
-    URL.revokeObjectURL(url)
-    push('success', 'Resource downloaded')
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500)
+    push('success', 'PDF downloaded')
   }
 
   const lessons = getCourseLessons(course)
   const quizReady = completedIds.length >= Math.max(1, lessons.length - 1)
 
   return (
-    <div className="atmosphere flex min-h-dvh overflow-x-clip">
+    <div className="atmosphere bg-page flex min-h-dvh overflow-x-clip" style={pageBackgroundStyle(pathname)}>
       <Seo title={lesson.title} description={lesson.summary} />
       {sidebar ? (
         <aside className="glass hidden w-[320px] shrink-0 overflow-y-auto border-r border-bright/15 p-4 lg:block">
@@ -109,7 +116,7 @@ export function LessonViewerPage() {
       ) : null}
 
       <div className="min-w-0 flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-bright/15 bg-navy/78 px-4 py-3 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-white/95 px-4 py-3 text-ink backdrop-blur">
           <button
             type="button"
             className="grid h-10 w-10 place-items-center rounded-lg hover:bg-white/8 lg:hidden"
@@ -128,13 +135,13 @@ export function LessonViewerPage() {
         </div>
 
         <div className="mx-auto max-w-3xl px-4 py-8">
-          <div className="overflow-hidden rounded-3xl border border-bright/20 bg-navy shadow-[inset_0_0_80px_rgb(var(--glow)_/_0.12)]">
-            <div className="flex aspect-video items-center justify-center bg-linear-to-br from-navy via-navy-700 to-baazex">
-              <div className="text-center text-ink">
-                <p className="text-xs tracking-[0.18em] text-ink uppercase">Lesson media</p>
-                <p className="mt-2 text-lg font-bold">{lesson.title}</p>
-                <p className="mt-1 text-xs text-ink/60">{lesson.durationMinutes} minute educational module</p>
-              </div>
+          <div className="relative aspect-video overflow-hidden rounded-3xl bg-navy">
+            <img src={courseCover(course.categoryId)} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-navy/55" />
+            <div className="relative flex h-full flex-col items-center justify-center px-6 text-center text-white">
+              <p className="text-xs tracking-[0.18em] text-bright uppercase">Lesson</p>
+              <p className="mt-2 text-lg font-semibold">{lesson.title}</p>
+              <p className="mt-1 text-xs text-mist/80">{lesson.durationMinutes} minute educational module</p>
             </div>
           </div>
 
@@ -148,7 +155,7 @@ export function LessonViewerPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Button className="w-full sm:w-auto" variant="secondary" icon={<Download className="h-4 w-4" />} onClick={downloadResource}>
-              Download resources
+              Download PDF
             </Button>
             <Button className="w-full sm:w-auto" loading={saving} onClick={markComplete}>
               {completed ? 'Completed · continue' : 'Mark as complete'}

@@ -1,6 +1,5 @@
 import { CategoryCard } from '@/components/course/CategoryCard'
 import { CourseCard } from '@/components/course/CourseCard'
-import { HeroVisual } from '@/components/home/HeroVisual'
 import { Seo } from '@/components/Seo'
 import { Button } from '@/components/ui/Button'
 import { Disclaimer } from '@/components/ui/Disclaimer'
@@ -8,7 +7,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useAcademy } from '@/context/AcademyContext'
 import { categories } from '@/data/categories'
 import { faqs } from '@/data/faqs'
-import { APP_NAME, COMPANY_NAME, DISCLAIMER } from '@/utils/constants'
+import { APP_NAME, DISCLAIMER } from '@/utils/constants'
 import { getLessonCount } from '@/utils/course'
 import {
   ArrowRight,
@@ -93,17 +92,21 @@ export function HomePage() {
         title="Learn Forex and Market Analysis"
         description={`${APP_NAME} offers structured education on forex, CFDs, analysis, risk management, and MetaTrader 5. Educational content only.`}
       />
-      <section className="gradient-hero relative overflow-hidden">
-        <div className="grid-fade absolute inset-0" />
-        <div className="relative mx-auto grid max-w-7xl min-w-0 items-center gap-10 px-4 py-12 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-12 lg:py-28">
-          <div className="min-w-0">
-            <p className="inline-flex max-w-full items-center rounded-full border border-ink/15 bg-white/60 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] text-ink uppercase sm:text-xs sm:tracking-[0.18em]">
-              {COMPANY_NAME}
-            </p>
-            <h1 className="display mt-5 text-[1.85rem] leading-[1.12] font-extrabold text-ink sm:text-5xl sm:leading-tight lg:text-[68px] lg:leading-[0.98]">
+      <section className="relative isolate overflow-hidden">
+        <img
+          src="/images/hero-person.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
+        />
+        <div className="absolute inset-0 bg-linear-to-b from-[#06152b]/80 via-[#06152b]/55 to-[#06152b]/35 lg:hidden" />
+        <div className="absolute inset-0 hidden bg-linear-to-r from-[#06152b] from-[18%] via-[#06152b]/35 via-[42%] to-transparent lg:block" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-[#06152b] to-transparent" />
+        <div className="relative mx-auto flex min-h-[34rem] max-w-7xl items-center px-4 py-16 sm:min-h-[40rem] sm:px-6 sm:py-24 lg:min-h-[46rem]">
+          <div className="min-w-0 max-w-xl lg:max-w-2xl">
+            <h1 className="display text-[1.85rem] leading-[1.12] font-semibold text-white sm:text-5xl sm:leading-tight lg:text-[68px] lg:leading-[0.98]">
               Learn the Markets. <span className="text-gradient">Trade with Greater Understanding.</span>
             </h1>
-            <p className="mt-5 max-w-xl text-sm leading-relaxed text-ink/70 sm:text-lg">
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-mist/80 sm:text-lg">
               Build your knowledge of forex, CFDs, market analysis, risk management, and the MT5 trading platform through structured educational courses.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -114,29 +117,26 @@ export function HomePage() {
                 Explore Courses
               </Button>
             </div>
-            <p className="mt-6 max-w-xl text-xs leading-relaxed text-ink/40">{DISCLAIMER}</p>
-          </div>
-          <div className="min-w-0">
-            <HeroVisual />
+            <p className="mt-6 max-w-xl text-xs leading-relaxed text-mist/50">{DISCLAIMER}</p>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-bright/15 bg-navy/80 py-10 text-ink shadow-[inset_0_0_80px_rgb(var(--glow)_/_0.08)] sm:py-16">
+      <section className="border-y border-white/10 bg-navy py-10 text-mist sm:py-16">
         <div className="mx-auto grid max-w-7xl min-w-0 items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-10">
           <div>
-            <p className="text-xs font-bold tracking-[0.18em] text-ink uppercase">AI Engine</p>
-            <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-4xl">
+            <p className="text-xs font-bold tracking-[0.18em] text-bright uppercase">AI Engine</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">
               Study charts with an educational assistant
             </h2>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-ink/65">
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-mist/75">
               The engine reads the live TradingView price and answers with a buy or sell call, an entry, a stop, and a target. Five questions are included. A Baazex deposit adds 15% of the amount as questions.
             </p>
             <Button className="mt-6" size="lg" onClick={() => navigate('/engine')} icon={<Sparkles className="h-4 w-4" />}>
               Try the AI Engine
             </Button>
           </div>
-          <div className="glass rounded-[28px] p-6">
+          <div className="glass rounded-[28px] p-6 text-ink">
             <p className="text-sm font-semibold text-ink">What are we studying today?</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {['Share my screen', 'Upload a chart', "Today's brief", 'Instrument notes'].map((item) => (
@@ -201,15 +201,15 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-bright/15 bg-navy/80 py-10 text-ink shadow-[inset_0_0_80px_rgb(var(--glow)_/_0.08)] sm:py-16">
+      <section className="border-y border-white/10 bg-navy py-10 text-mist sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading kicker="How it works" title="Four steps from account to certificate" light />
           <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
             {steps.map((item) => (
               <article key={item.step}>
-                <p className="text-3xl font-extrabold text-ink/80">{item.step}</p>
-                <h3 className="mt-3 text-lg font-bold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink/65">{item.text}</p>
+                <p className="font-serif text-3xl text-bright">{item.step}</p>
+                <h3 className="mt-3 text-lg font-bold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-mist/70">{item.text}</p>
               </article>
             ))}
           </div>
@@ -286,8 +286,8 @@ export function HomePage() {
 
       <section className="px-4 pb-10 sm:px-6 sm:pb-16">
         <div className="gradient-hero mx-auto max-w-7xl overflow-hidden rounded-3xl px-5 py-10 text-center sm:px-6 sm:py-14">
-          <h2 className="text-2xl font-extrabold text-ink sm:text-4xl">Study the markets with a professional standard of care.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ink/70">
+          <h2 className="text-2xl font-semibold text-white sm:text-4xl">Study the markets with a professional standard of care.</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-mist/75">
             Enrol in {APP_NAME} to follow a structured curriculum. Education first. No profit claims. No personalised advice.
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
@@ -298,7 +298,7 @@ export function HomePage() {
               Explore Courses
             </Button>
           </div>
-          <Disclaimer className="mx-auto mt-8 max-w-3xl text-ink/40" compact />
+          <Disclaimer className="mx-auto mt-8 max-w-3xl text-mist/50" compact />
         </div>
       </section>
     </>
@@ -319,8 +319,8 @@ function SectionHeading({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p className={`text-xs font-bold tracking-[0.18em] uppercase ${light ? 'text-ink' : 'text-accent'}`}>{kicker}</p>
-        <h2 className={`mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl ${light ? 'text-ink' : 'text-ink'}`}>{title}</h2>
+        <p className={`text-xs font-bold tracking-[0.18em] uppercase ${light ? 'text-bright' : 'text-accent'}`}>{kicker}</p>
+        <h2 className={`mt-2 text-2xl font-semibold tracking-tight sm:text-3xl ${light ? 'text-white' : 'text-ink'}`}>{title}</h2>
       </div>
       {action}
     </div>

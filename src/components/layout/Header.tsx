@@ -1,3 +1,4 @@
+import { SocialBar } from '@/components/layout/SocialDock'
 import { Logo } from '@/components/ui/Logo'
 import { useAuth } from '@/context/AuthContext'
 import { APP_NAME } from '@/utils/constants'
@@ -20,12 +21,12 @@ export function Header() {
   const { user } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-baazex/15 bg-white/90 shadow-[0_12px_40px_-24px_rgb(var(--glow)_/_0.45)] backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
-        <Link to="/" aria-label={`${APP_NAME} home`}>
-          <Logo />
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-navy/95 text-mist shadow-[0_12px_40px_-24px_rgb(6_21_43_/_0.65)] backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-1.5 px-3 sm:h-16 lg:px-4 xl:gap-2 xl:px-6">
+        <Link to="/" aria-label={`${APP_NAME} home`} className="shrink-0 [&_img]:h-9 xl:[&_img]:h-12">
+          <Logo light />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav className="hidden shrink-0 items-center gap-0.5 lg:flex xl:gap-1" aria-label="Primary">
           {links.map((link) => (
             <NavLink
               key={link.to}
@@ -33,8 +34,8 @@ export function Header() {
               end={link.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'rounded-lg px-3 py-2 text-sm font-semibold tracking-wide transition',
-                  isActive ? 'bg-baazex text-on-button shadow-float' : 'text-ink/70 hover:text-accent',
+                  'whitespace-nowrap rounded-lg px-1 py-1.5 text-[13px] font-semibold transition xl:px-2 xl:py-2 xl:text-sm xl:tracking-wide',
+                  isActive ? 'bg-baazex text-white shadow-float' : 'text-mist/75 hover:text-white',
                 )
               }
             >
@@ -42,25 +43,26 @@ export function Header() {
             </NavLink>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden shrink-0 items-center gap-1 lg:flex xl:gap-2">
+          <SocialBar compact />
           {user ? (
             <>
               <Link
                 to="/dashboard"
-                className="inline-flex h-9 items-center rounded-lg border border-baazex/25 px-3 text-sm font-semibold text-accent hover:bg-baazex/5"
+                className="inline-flex h-9 items-center whitespace-nowrap rounded-lg border border-white/20 px-2.5 text-[13px] font-semibold text-white hover:bg-white/10 xl:px-3 xl:text-sm"
               >
                 Dashboard
               </Link>
               <Link
                 to="/engine"
-                className="inline-flex h-9 items-center rounded-lg bg-baazex px-4 text-sm font-semibold text-on-button shadow-float hover:bg-baazex-600"
+                className="inline-flex h-9 items-center whitespace-nowrap rounded-lg bg-baazex px-3 text-[13px] font-semibold text-on-button shadow-float hover:bg-baazex-600 xl:px-4 xl:text-sm"
               >
                 Open AI Engine
               </Link>
             </>
           ) : (
             <>
-              <Link to="/login" className="px-3 text-sm font-semibold text-ink/80 hover:text-accent">
+              <Link to="/login" className="px-3 text-sm font-semibold text-mist/80 hover:text-white">
                 Login
               </Link>
               <Link
@@ -74,7 +76,7 @@ export function Header() {
         </div>
         <button
           type="button"
-          className="grid h-11 w-11 place-items-center rounded-lg text-accent lg:hidden"
+          className="grid h-11 w-11 place-items-center rounded-lg text-white lg:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label={open ? 'Close menu' : 'Open menu'}
         >
@@ -82,36 +84,37 @@ export function Header() {
         </button>
       </div>
       {open ? (
-        <div className="max-h-[min(80dvh,calc(100dvh-3.5rem))] overflow-y-auto border-t border-line bg-white px-4 py-4 lg:hidden">
+        <div className="max-h-[min(80dvh,calc(100dvh-3.5rem))] overflow-y-auto border-t border-white/10 bg-navy px-4 py-4 lg:hidden">
           <div className="flex flex-col gap-1">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-semibold text-ink"
+                className="rounded-lg px-3 py-3 text-sm font-semibold text-mist"
               >
                 {link.label}
               </NavLink>
             ))}
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3 flex flex-col items-start gap-2">
+              <SocialBar />
               {user ? (
                 <Link
                   to="/engine"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-on-button"
+                  className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-white"
                 >
                   Open AI Engine
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-semibold text-ink">
+                  <Link to="/login" onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-semibold text-mist">
                     Login
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setOpen(false)}
-                    className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-on-button"
+                    className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-white"
                   >
                     Start Learning
                   </Link>

@@ -1,8 +1,35 @@
+import { BRAND } from '@/assets/brand'
 import { APP_SHORT_NAME } from '@/utils/constants'
 import { cn } from '@/utils/cn'
 import { useId } from 'react'
 
 export function Logo({
+  light = false,
+  compact = false,
+  className,
+}: {
+  light?: boolean
+  compact?: boolean
+  className?: string
+}) {
+  if (BRAND.id === 'baazex') {
+    if (compact) {
+      return <img src="/brand/logo-mark.png" alt="" className={cn('h-9 w-9 object-contain', className)} />
+    }
+
+    return (
+      <img
+        src={light ? '/brand/logo-light.png' : '/brand/logo-ink.png'}
+        alt={BRAND.name}
+        className={cn('h-10 w-auto sm:h-12', className)}
+      />
+    )
+  }
+
+  return <TextLogo light={light} compact={compact} className={className} />
+}
+
+function TextLogo({
   light = false,
   compact = false,
   className,
@@ -22,7 +49,7 @@ export function Logo({
           />
           <path
             d="M7 28 13.5 21.5l4.2 3.4L24 16.5l5 4.6"
-            stroke="#0A1F44"
+            stroke="var(--color-ink)"
             strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -30,18 +57,21 @@ export function Logo({
           />
           <defs>
             <linearGradient id={markId} x1="9" y1="10" x2="28" y2="30">
-              <stop stopColor="#0A1F44" />
-              <stop offset="1" stopColor="#1468B8" />
+              <stop stopColor="var(--color-ink)" />
+              <stop offset="1" stopColor="var(--color-accent)" />
             </linearGradient>
           </defs>
         </svg>
       </span>
       {compact ? null : (
         <span className="leading-tight">
-          <span className={cn('block text-[13px] font-extrabold tracking-tight', light ? 'text-ink' : 'text-ink')}>
-            {APP_SHORT_NAME}
-          </span>
-          <span className={cn('block text-[11px] font-semibold tracking-[0.18em] uppercase', light ? 'text-ink/80' : 'text-accent')}>
+          <span className="block text-[13px] font-extrabold tracking-tight text-ink">{APP_SHORT_NAME}</span>
+          <span
+            className={cn(
+              'block text-[11px] font-semibold tracking-[0.18em] uppercase',
+              light ? 'text-ink/80' : 'text-accent',
+            )}
+          >
             Academy
           </span>
         </span>

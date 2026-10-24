@@ -13,11 +13,15 @@ import { aiService, formatChartLevels } from '@/services/ai'
 import { conversationService, newMessage } from '@/services/conversations'
 import { formatLiveQuote, tradingViewService, type LiveQuote } from '@/services/tradingView'
 import type { AiAttachment, AiConversation } from '@/types'
+import { media } from '@/data/media'
 import { APP_NAME, DISCLAIMER, ENGINE_NAME } from '@/utils/constants'
+import { pageBackgroundStyle } from '@/utils/pageBackground'
 import { analysisTitle, uid } from '@/utils/format'
 import { Camera, Clapperboard, Copy, Menu, MonitorUp, NotebookPen, RefreshCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 export function EnginePage() {
+  const { pathname } = useLocation()
   const { user } = useAuth()
   const { push } = useToast()
   const [collapsed, setCollapsed] = useState(false)
@@ -107,6 +111,7 @@ export function EnginePage() {
   }, [])
 
   useEffect(() => {
+    if (!threadCount) return
     threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: 'smooth' })
   }, [threadCount, sending])
 
@@ -548,7 +553,7 @@ export function EnginePage() {
   }
 
   return (
-    <div className="atmosphere flex h-dvh max-w-full overflow-hidden bg-canvas text-ink">
+    <div className="atmosphere bg-page flex h-dvh max-w-full overflow-hidden text-ink" style={pageBackgroundStyle(pathname)}>
       <Seo
         title="AI Engine"
         description={`${APP_NAME} AI Engine — educational chart and market-literacy assistant. Not investment advice.`}
@@ -637,8 +642,12 @@ export function EnginePage() {
           />
           {empty ? (
             <div className="relative mx-auto flex max-w-3xl flex-col items-center px-4 py-6 text-center sm:py-14">
-              <div className="engine-orb mb-5 h-14 w-14 rounded-full sm:mb-8 sm:h-20 sm:w-20" />
-              <h1 className="text-[1.65rem] leading-tight font-extrabold tracking-tight sm:text-5xl">
+              <img
+                src={media.engine}
+                alt="Close view of a candlestick chart"
+                className="mb-6 h-36 w-full max-w-xl rounded-3xl object-cover shadow-card sm:h-44"
+              />
+              <h1 className="text-[1.65rem] leading-tight font-semibold tracking-tight text-ink sm:text-5xl">
                 What are we <span className="text-accent">studying</span> today?
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted sm:mt-4">
