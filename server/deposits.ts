@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { BRAND } from './brand.js'
 
 function json(status: number, body: unknown) {
   return new Response(JSON.stringify(body), {
@@ -50,7 +51,7 @@ export async function recordDeposit(admin: SupabaseClient, baazexId: string, amo
   const id = baazexId.trim()
   const ticket = reference.trim()
   const questions = questionsFor(amountUsd)
-  if (!id) throw new Error('Enter the Baazex ID.')
+  if (!id) throw new Error(`Enter the ${BRAND.shortName} ID.`)
   if (!Number.isFinite(amountUsd) || amountUsd <= 0) throw new Error('Enter the deposit amount in dollars.')
   if (!ticket) throw new Error('Enter a deposit reference so it is only counted once.')
   if (questions < 1) throw new Error('That deposit is too small to add a question.')
@@ -60,8 +61,8 @@ export async function recordDeposit(admin: SupabaseClient, baazexId: string, amo
     .select('id, bonus_questions, email, full_name')
     .eq('baazex_id', id)
   if (error) throw new Error(error.message)
-  if (!matches || matches.length === 0) throw new Error('No student has saved that Baazex ID.')
-  if (matches.length > 1) throw new Error('More than one student uses that Baazex ID.')
+  if (!matches || matches.length === 0) throw new Error(`No student has saved that ${BRAND.shortName} ID.`)
+  if (matches.length > 1) throw new Error(`More than one student uses that ${BRAND.shortName} ID.`)
 
   const profile = matches[0]
   const { error: insertError } = await admin.from('deposits').insert({

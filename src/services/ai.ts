@@ -21,17 +21,18 @@ import { symbolsInText, TRADING_VIEW_SYMBOLS } from '@/data/tradingView'
 import { formatLiveQuote, type LiveQuote } from '@/services/tradingView'
 import { inspectAttachments, type ChartRead } from '@/utils/chartRead'
 
-const SYSTEM_RULES = `You are ${ENGINE_NAME}, the product assistant for ${APP_NAME} (forex, CFDs, MetaTrader 5, sessions, and risk).
+const SYSTEM_RULES = `You are ${ENGINE_NAME}, the product assistant for ${APP_NAME} (NSE cash, MCX commodity futures, sessions in IST, and risk).
 
 When the user asks about a market and you have a symbol, a timeframe, and a last price, the first lines of the answer MUST be the call. Do not ask for a chart first.
 - Symbol and timeframe
 - Bias: Buy or Sell. If they did not choose a side, use Buy and say it is the working bias.
 - Entry: the TradingView close number in the live-quote block. Never the bid and never the ask. If they typed their own last price, use that instead.
-- Stop and target: gold about $8 stop and $15 target; silver about $0.30 stop and $0.50 target; EURUSD about 25 pips stop and 40 pips target; yen pairs about 0.25 stop and 0.40 target; GBPUSD a little wider; index and oil CFDs use a small point distance beyond the entry
-- One short reason from how that product is quoted, which session matters, and what usually moves it
+- Stop and target, labeled as study examples: Nifty about 40 points stop and 80 points target; Bank Nifty about 80 and 150 points; gold about 150 and 300 rupees; silver about 400 and 800 rupees; crude about 40 and 80 rupees. Do not use pips or forex sessions.
+- One short reason from how that product is quoted, which Indian session matters, and what usually moves it
 
+NIFTY and BANKNIFTY are NSE cash indexes in points. Shares are NSE cash in rupees per share, about 09:15–15:30 IST. GOLD, SILVER, and the other commodities are MCX futures in rupees, about 09:00–23:30 IST. A gold chart is GOLD. A Nifty chart is NIFTY. Never answer with a currency pair.
 A TradingView live quote in the message is the last price. Use that close as the entry and do not ask for a price that is already quoted.
-When a chart image is attached, ignore every other symbol. The first lines MUST be the call for the symbol, timeframe, and last price printed on that chart. A gold chart is XAUUSD. A label of 1D means daily. The close printed on the chart is the entry. Do not ask for a symbol, timeframe, or price that is already printed. Do not mention any other symbol.
+When a chart image is attached, ignore every other symbol. The first lines MUST be the call for the symbol, timeframe, and last price printed on that chart. A label of 1D means daily. The close printed on the chart is the entry. Do not ask for a symbol, timeframe, or price that is already printed. Do not mention any other symbol.
 If no chart image is attached and the symbol, timeframe, or a live price is missing, ask only for the missing piece and do not invent a quote.
 Do not invent candle prices you cannot see. Results are not guaranteed. Close with one short risk reminder.`
 
@@ -69,7 +70,7 @@ const TOPIC_KEYS: Array<{ topic: EngineTopic; keys: string[] }> = [
   { topic: 'mt5', keys: ['mt5', 'metatrader', 'market watch', 'ticket', 'journal', 'toolbox'] },
   { topic: 'risk', keys: ['leverage', 'margin', 'lot', 'lots', 'pip', 'pips', 'position size', 'stop out', 'risk'] },
   { topic: 'orders', keys: ['order', 'limit', 'pending', 'market order', 'buy stop', 'sell stop'] },
-  { topic: 'sessions', keys: ['session', 'london', 'new york', 'tokyo', 'overlap', 'liquidity'] },
+  { topic: 'sessions', keys: ['session', 'london', 'new york', 'tokyo', 'overlap', 'liquidity', 'nse', 'mcx', 'ist'] },
   { topic: 'pairs', keys: ['pair', 'quote', 'base currency', 'spread', 'bid', 'ask', 'major', 'cross'] },
   { topic: 'psychology', keys: ['psychology', 'emotion', 'discipline', 'fomo', 'revenge'] },
   { topic: 'fundamentals', keys: ['nfp', 'cpi', 'fed', 'ecb', 'boe', 'fomc', 'news', 'fundamental', 'interest rate'] },
@@ -134,12 +135,13 @@ const TIMEFRAME_PATTERN =
   /\b(?:m1|m5|m15|m30|h1|h4|d1|w1|1m|5m|15m|30m|1h|4h|daily|weekly|\d+\s*(?:minute|hour)s?)\b/i
 
 const LEVEL_DISTANCE: Record<string, { stop: number; target: number }> = {
-  EURUSD: { stop: 0.0025, target: 0.004 },
-  GBPUSD: { stop: 0.003, target: 0.0048 },
-  XAUUSD: { stop: 8, target: 15 },
-  US30: { stop: 80, target: 140 },
-  NAS100: { stop: 60, target: 110 },
-  USOIL: { stop: 0.4, target: 0.7 },
+  NIFTY: { stop: 40, target: 80 },
+  BANKNIFTY: { stop: 80, target: 150 },
+  GOLD: { stop: 150, target: 300 },
+  SILVER: { stop: 400, target: 800 },
+  CRUDEOIL: { stop: 40, target: 80 },
+  NATURALGAS: { stop: 3, target: 6 },
+  COPPER: { stop: 8, target: 15 },
 }
 
 function detectTimeframe(text: string) {
@@ -215,9 +217,11 @@ function symbolFromText(text: string) {
     if (index >= 0 && (best === undefined || index < best.index)) best = { symbol: item.symbol, index }
   }
   if (best) return best.symbol
-  if (compact.includes('XAU') || compact.includes('GOLD')) return 'XAUUSD'
-  if (compact.includes('XAG') || compact.includes('SILVER')) return 'XAGUSD'
-  if (compact.includes('SPOT') && compact.includes('DOLLAR')) return 'XAUUSD'
+  if (compact.includes('BANKNIFTY') || compact.includes('NIFTYBANK')) return 'BANKNIFTY'
+  if (compact.includes('NIFTY')) return 'NIFTY'
+  if (compact.includes('XAU') || compact.includes('GOLD')) return 'GOLD'
+  if (compact.includes('XAG') || compact.includes('SILVER')) return 'SILVER'
+  if (compact.includes('CRUDE')) return 'CRUDEOIL'
   return undefined
 }
 
@@ -298,10 +302,7 @@ function formatLevel(symbol: string, value: number) {
 function levelDistance(symbol: string, price: number) {
   const known = LEVEL_DISTANCE[symbol]
   if (known) return known
-  if (symbol === 'XAGUSD') return { stop: 0.3, target: 0.5 }
-  if (symbol.endsWith('JPY') && symbol.length === 6) return { stop: 0.25, target: 0.4 }
-  if (/^[A-Z]{6}$/.test(symbol)) return { stop: 0.0025, target: 0.004 }
-  return { stop: price * 0.004, target: price * 0.007 }
+  return { stop: price * 0.004, target: price * 0.008 }
 }
 
 function heading(title: string) {
@@ -319,7 +320,7 @@ function courseLine(topics: EngineTopic[]) {
   const unique = picked.filter((item, index) => picked.findIndex((row) => row?.slug === item?.slug) === index)
   const first = unique[0]
   const second = unique[1]
-  if (!first) return 'Suggested next lesson: Introduction to Forex Trading.'
+  if (!first) return 'Suggested next lesson: Introduction to MCX.'
   if (second) return `Suggested next lessons: ${first.title}, then ${second.title}.`
   return `Suggested next lesson: ${first.title}.`
 }
@@ -364,13 +365,13 @@ function topicSection(topic: EngineTopic, brief: boolean) {
   const body: Partial<Record<EngineTopic, string>> = {
     orders: `${heading('Order types')}\n${ORDER_NOTE}`,
     risk: `${heading('Risk, size and leverage')}\n${RISK_NOTE}`,
-    mt5: `${heading('MetaTrader 5')}\n${MT5_NOTE}`,
-    pairs: `${heading('Quotes and pairs')}\n${PAIRS_NOTE}`,
+    mt5: `${heading('The trading screen')}\n${MT5_NOTE}`,
+    pairs: `${heading('Quotes')}\n${PAIRS_NOTE}`,
     sessions: `${heading('Sessions and liquidity')}\n${SESSION_NOTE}`,
     ta: `${heading('Chart language')}\n${TA_NOTE}`,
     fundamentals: `${heading('Calendar literacy')}\n${FUNDAMENTALS_NOTE}`,
     psychology: `${heading('Process over impulse')}\n${PSYCH_NOTE}`,
-    cfd: `${heading('What a CFD is')}\n${CFD_NOTE}`,
+    cfd: `${heading('NSE and MCX')}\n${CFD_NOTE}`,
     ib: `${heading('IB education')}\nIntroducing-broker work is about explaining products, risk, and account opening clearly. It is not about promising results or circulating signals. If you support clients, send them to structured lessons rather than a screenshot with arrows.`,
   }
   const text = body[topic]
@@ -382,13 +383,13 @@ function topicSection(topic: EngineTopic, brief: boolean) {
 function briefSection(symbols: string[]) {
   const now = new Date()
   const clock = sessionClock(now)
-  const watch = symbols.length ? symbols : ['EURUSD', 'XAUUSD', 'US30']
+  const watch = symbols.length ? symbols : ['NIFTY', 'BANKNIFTY', 'GOLD']
   return [
     heading(`Today's study brief — ${weekdayLabel(now)}`),
-    `UTC teaching clock: ${clock.summary}`,
+    `IST clock: ${clock.summary}`,
     heading('A practical study loop (no orders required)'),
     bullets([
-      `Write three names on a pad: ${watch.join(', ')}. For each, note the product type (spot FX vs CFD) and the next high-impact print that can affect it.`,
+      `Write three names on a pad: ${watch.join(', ')}. For each, note whether it is an NSE cash index, an NSE share, or an MCX future, and the next print that can affect it.`,
       'Open one timeframe only (H1 or H4 is enough for a daily worksheet). Label last obvious swing high and low.',
       'Check whether you are on a demo or live account. If you are studying, demo is the right classroom.',
       'Decide in writing whether today is a study day. Sitting out is a complete outcome.',
@@ -418,7 +419,7 @@ function oneCall(input: AskInput, symbol: string | undefined, context: string, r
   const live = symbol ? quoteFor(input, symbol) : undefined
   const price = typedPrice ?? live?.close
   const missing = [
-    symbol ? null : 'the symbol (for example EURUSD or XAUUSD)',
+    symbol ? null : 'the symbol (for example NIFTY or GOLD)',
     timeframe ? null : 'the timeframe (for example H1 or H4)',
     price !== undefined ? null : 'the last price — the TradingView quote did not load for this symbol',
   ].filter((item): item is string => Boolean(item))
@@ -537,7 +538,7 @@ function userContent(input: AskInput, chartNote: string) {
   const text = [
     chartLabel ? '' : quoteBlock(input.liveQuotes),
     chartLabel
-      ? 'A chart image is attached. The symbol, timeframe, and last price printed on the chart are the ones for this answer. That label wins over every other symbol. A gold chart is XAUUSD. Use the price shown on the chart. Do not analyse a different pair.'
+      ? 'A chart image is attached. The symbol, timeframe, and last price printed on the chart are the ones for this answer. That label wins over every other symbol. A gold chart is GOLD. A Nifty chart is NIFTY. Use the price shown on the chart. Do not analyse a currency pair.'
       : input.instrument
         ? `Instrument in focus: ${input.instrument}.`
         : '',

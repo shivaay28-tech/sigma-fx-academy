@@ -2,14 +2,11 @@ import { Logo } from '@/components/ui/Logo'
 import { Disclaimer } from '@/components/ui/Disclaimer'
 import { media } from '@/data/media'
 import { APP_NAME } from '@/utils/constants'
-import { pageBackgroundStyle } from '@/utils/pageBackground'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 
 export function AuthLayout() {
-  const { pathname } = useLocation()
-
   return (
-    <div className="atmosphere bg-page min-h-dvh overflow-x-clip" style={pageBackgroundStyle(pathname)}>
+    <div className="atmosphere min-h-dvh overflow-x-clip">
       <div className="grid min-h-screen lg:grid-cols-2">
         <div className="relative hidden overflow-hidden border-r border-white/10 bg-navy lg:flex lg:flex-col lg:justify-between lg:p-10">
           <img src={media.study} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -21,7 +18,7 @@ export function AuthLayout() {
             <p className="text-sm font-semibold tracking-[0.2em] text-bright uppercase">Education only</p>
             <h1 className="mt-3 text-4xl font-semibold text-white">Build market knowledge before you act.</h1>
             <p className="mt-4 text-sm leading-relaxed text-mist/80">
-              Create a {APP_NAME} account to enrol in structured courses on forex, CFDs, analysis, risk, and MetaTrader 5.
+              Create a {APP_NAME} account to enrol in structured courses on MCX commodities, the spot market, analysis, and risk.
             </p>
           </div>
           <Disclaimer className="relative text-mist/55" compact />

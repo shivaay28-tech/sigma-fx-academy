@@ -11,7 +11,7 @@ import { categories } from '@/data/categories'
 import { countries } from '@/data/countries'
 import { authService } from '@/services/auth'
 import { catalogService } from '@/services/catalog'
-import { APP_NAME, FREE_QUESTIONS } from '@/utils/constants'
+import { APP_NAME, APP_SHORT_NAME, FREE_QUESTIONS } from '@/utils/constants'
 import { progressService } from '@/services/progress'
 import type { Course, Difficulty, Lesson, Module, SessionUser } from '@/types'
 import { getCourseLessons, getLessonCount, progressPercent } from '@/utils/course'
@@ -429,7 +429,7 @@ export function AdminStudentsPage() {
             <tr>
               <th className="px-3 py-2">Name</th>
               <th className="px-3 py-2">Email</th>
-              <th className="px-3 py-2">Baazex ID</th>
+              <th className="px-3 py-2">{APP_SHORT_NAME} ID</th>
               <th className="px-3 py-2">Questions</th>
               <th className="px-3 py-2">Country</th>
               <th className="px-3 py-2">Role</th>

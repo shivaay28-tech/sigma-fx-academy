@@ -5,15 +5,30 @@ import { isSupabaseEnabled } from '@/services/backend'
 import { courseToRow, mapCourse, mapQuiz, quizToRow } from '@/services/mappers'
 import { getSupabase } from '@/services/supabase'
 import type { Course, Quiz } from '@/types'
-import { APP_NAME, STORAGE_KEYS } from '@/utils/constants'
+import { APP_NAME, CATALOG_SEED_VERSION, STORAGE_KEYS } from '@/utils/constants'
 import { uid } from '@/utils/format'
 import { readJson, writeJson } from '@/services/storage'
 
+function catalogIsCurrent() {
+  return readJson<number>(STORAGE_KEYS.catalogVersion, 0) >= CATALOG_SEED_VERSION
+}
+
+const reseeded = { courses: false, quizzes: false }
+
+function noteReseed(kind: 'courses' | 'quizzes') {
+  reseeded[kind] = true
+  if (reseeded.courses && reseeded.quizzes) writeJson(STORAGE_KEYS.catalogVersion, CATALOG_SEED_VERSION)
+}
+
 function loadCourses() {
   const stored = readJson<Course[] | null>(STORAGE_KEYS.catalog, null)
-  if (!stored || !stored.length) {
-    writeJson(STORAGE_KEYS.catalog, seedCourses)
-    return seedCourses
+  if (!stored || !stored.length || !catalogIsCurrent()) {
+    const seedIds = new Set(seedCourses.map((course) => course.id))
+    const custom = (stored ?? []).filter((course) => !seedIds.has(course.id))
+    const next = [...seedCourses, ...custom]
+    writeJson(STORAGE_KEYS.catalog, next)
+    noteReseed('courses')
+    return next
   }
   const missing = seedCourses.filter((seed) => !stored.some((course) => course.id === seed.id))
   if (!missing.length) return stored
@@ -24,9 +39,13 @@ function loadCourses() {
 
 function loadQuizzes() {
   const stored = readJson<Quiz[] | null>(STORAGE_KEYS.quizzes, null)
-  if (!stored || !stored.length) {
-    writeJson(STORAGE_KEYS.quizzes, seedQuizzes)
-    return seedQuizzes
+  if (!stored || !stored.length || !catalogIsCurrent()) {
+    const seedIds = new Set(seedQuizzes.map((quiz) => quiz.id))
+    const custom = (stored ?? []).filter((quiz) => !seedIds.has(quiz.id))
+    const next = [...seedQuizzes, ...custom]
+    writeJson(STORAGE_KEYS.quizzes, next)
+    noteReseed('quizzes')
+    return next
   }
   const missing = seedQuizzes.filter((seed) => !stored.some((quiz) => quiz.id === seed.id))
   if (!missing.length) return stored
@@ -164,7 +183,7 @@ export const catalogService = {
       title: 'Untitled course',
       subtitle: 'Add a short summary for learners.',
       description: 'Describe what this educational course covers.',
-      categoryId: 'cat-forex-basics',
+      categoryId: 'cat-mcx-basics',
       difficulty: 'Beginner',
       durationHours: 1,
       objectives: ['Describe a core market concept'],

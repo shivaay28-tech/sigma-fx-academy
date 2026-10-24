@@ -18,8 +18,8 @@ const columns = [
     title: 'Learn',
     links: [
       { to: '/categories', label: 'Categories' },
-      { to: '/courses/introduction-to-forex-trading', label: 'Forex basics' },
-      { to: '/courses/introduction-to-metatrader-5', label: 'MetaTrader 5' },
+      { to: '/courses/introduction-to-mcx', label: 'Introduction to MCX' },
+      { to: '/courses/msc-and-mcx', label: 'MSC and MCX' },
       { to: '/courses/risk-management-fundamentals', label: 'Risk management' },
     ],
   },
@@ -42,7 +42,7 @@ export function Footer() {
         <div className="col-span-2 lg:col-span-4">
           <Logo light />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-mist/70">
-            Structured education on forex, CFDs, market analysis, risk, and MetaTrader 5 from {COMPANY_NAME}.
+            Structured education on MCX commodities and the spot market from {COMPANY_NAME}.
           </p>
           <a href={COMPANY_URL} className="mt-4 inline-block text-sm font-semibold text-mist hover:underline">
             www.{COMPANY_HOST}

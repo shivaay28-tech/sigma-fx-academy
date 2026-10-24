@@ -7,7 +7,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useAcademy } from '@/context/AcademyContext'
 import { categories } from '@/data/categories'
 import { faqs } from '@/data/faqs'
-import { APP_NAME, DISCLAIMER } from '@/utils/constants'
+import { APP_NAME, APP_SHORT_NAME, DISCLAIMER } from '@/utils/constants'
 import { getLessonCount } from '@/utils/course'
 import {
   ArrowRight,
@@ -25,13 +25,13 @@ import { Link, useNavigate } from 'react-router-dom'
 const levels = [
   {
     title: 'Beginner',
-    text: 'Market structure, pairs, order types, and a first look at MetaTrader 5.',
-    items: ['Forex basics', 'Currency pairs', 'MT5 layout'],
+    text: 'How MCX is organised, how gold, silver, and crude are quoted, and how an order is read.',
+    items: ['MCX basics', 'Gold, silver, crude', 'The contract screen'],
   },
   {
     title: 'Intermediate',
     text: 'Analysis methods, product math, and the language of risk.',
-    items: ['Technical analysis', 'Fundamentals', 'Pips and margin'],
+    items: ['Commodity charts', 'What moves prices', 'Lots and margin'],
   },
   {
     title: 'Advanced',
@@ -54,7 +54,7 @@ const why = [
   {
     icon: LineChart,
     title: 'Platform literacy',
-    text: 'MetaTrader 5 is taught as a professional terminal: layout, tickets, history, and journals.',
+    text: 'The MCX screen is taught as a contract board: symbol, expiry, bid and ask, and the order ticket.',
   },
   {
     icon: Sparkles,
@@ -65,7 +65,7 @@ const why = [
 
 const steps = [
   { step: '01', title: 'Create a free account', text: 'Register with your name, email, mobile, and country.' },
-  { step: '02', title: 'Choose a learning path', text: 'Start with forex basics or jump to a labelled intermediate topic.' },
+  { step: '02', title: 'Choose a learning path', text: 'Start with MCX basics or the MSC and MCX comparison, then move to a labelled intermediate topic.' },
   { step: '03', title: 'Study lessons and notes', text: 'Watch the media placeholder, read the material, and keep private notes.' },
   { step: '04', title: 'Check understanding', text: 'Pass the quiz at 70% to complete the course and receive a sample certificate.' },
 ]
@@ -89,8 +89,8 @@ export function HomePage() {
   return (
     <>
       <Seo
-        title="Learn Forex and Market Analysis"
-        description={`${APP_NAME} offers structured education on forex, CFDs, analysis, risk management, and MetaTrader 5. Educational content only.`}
+        title="Learn MCX and Commodity Markets"
+        description={`${APP_NAME} offers structured education on MCX commodities, the spot market, analysis, and risk. Educational content only.`}
       />
       <section className="relative isolate overflow-hidden">
         <img
@@ -107,7 +107,7 @@ export function HomePage() {
               Learn the Markets. <span className="text-gradient">Trade with Greater Understanding.</span>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-mist/80 sm:text-lg">
-              Build your knowledge of forex, CFDs, market analysis, risk management, and the MT5 trading platform through structured educational courses.
+              Build your knowledge of MCX commodities — gold, silver, crude oil, natural gas, and metals — and of the spot market beside those contracts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/engine')} icon={<Sparkles className="h-4 w-4" />}>
@@ -130,7 +130,7 @@ export function HomePage() {
               Study charts with an educational assistant
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-mist/75">
-              The engine reads the live TradingView price and answers with a buy or sell call, an entry, a stop, and a target. Five questions are included. A Baazex deposit adds 15% of the amount as questions.
+              The engine reads the live TradingView price and answers with a buy or sell call, an entry, a stop, and a target. Five questions are included. A {APP_SHORT_NAME} deposit adds 15% of the amount as questions.
             </p>
             <Button className="mt-6" size="lg" onClick={() => navigate('/engine')} icon={<Sparkles className="h-4 w-4" />}>
               Try the AI Engine
@@ -236,9 +236,9 @@ export function HomePage() {
               After you enrol, the student workspace keeps recent courses, completion, and recommended next lessons in one place.
             </p>
             <div className="mt-6 space-y-4">
-              <ProgressBar value={72} label="Introduction to Forex Trading" />
-              <ProgressBar value={40} label="Understanding Currency Pairs" />
-              <ProgressBar value={18} label="Introduction to MetaTrader 5" />
+              <ProgressBar value={72} label="Introduction to MCX" />
+              <ProgressBar value={40} label="MCX Gold, Silver, Crude, and Copper" />
+              <ProgressBar value={18} label="MSC and MCX" />
             </div>
             <Link to="/register" className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent">
               Create an account to save progress <ArrowRight className="h-4 w-4" />

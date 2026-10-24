@@ -13,7 +13,7 @@ export function TermsPage() {
         <li>Courses do not constitute investment advice or a personal recommendation.</li>
         <li>Certificates record completion of educational material. They are not a professional licence.</li>
         <li>Account and progress data are stored on the academy's servers when Supabase is configured, or in this browser during local demo mode.</li>
-        <li>Trading forex and CFDs involves significant risk and may not be suitable for all investors.</li>
+        <li>Trading MCX commodity derivatives involves significant risk and may not be suitable for all investors.</li>
       </ul>
     </div>
   )

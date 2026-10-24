@@ -1,61 +1,97 @@
 import { instruments } from '@/data/instruments'
 
 export const TOPIC_COURSES: Record<string, { title: string; slug: string }> = {
-  pairs: { title: 'Understanding Currency Pairs', slug: 'understanding-currency-pairs' },
-  sessions: { title: 'Introduction to Forex Trading', slug: 'introduction-to-forex-trading' },
-  orders: { title: 'How Buy and Sell Orders Work', slug: 'how-buy-and-sell-orders-work' },
-  risk: { title: 'Pips, Lots, Leverage and Margin', slug: 'pips-lots-leverage-and-margin' },
-  mt5: { title: 'Introduction to MetaTrader 5', slug: 'introduction-to-metatrader-5' },
-  ta: { title: 'Technical Analysis Essentials', slug: 'technical-analysis-essentials' },
-  fundamentals: { title: 'Fundamental Market Analysis', slug: 'fundamental-market-analysis' },
+  pairs: { title: 'MCX Gold, Silver, Crude, and Copper', slug: 'mcx-gold-silver-crude-and-copper' },
+  sessions: { title: 'Introduction to MCX', slug: 'introduction-to-mcx' },
+  orders: { title: 'MCX Orders and Expiry', slug: 'mcx-orders-and-expiry' },
+  risk: { title: 'MCX Lots, Margin, and Mark-to-Market', slug: 'mcx-lots-margin-and-mark-to-market' },
+  mt5: { title: 'The MCX Trading Screen', slug: 'the-mcx-trading-screen' },
+  ta: { title: 'Charts for MCX Commodities', slug: 'charts-for-mcx-commodities' },
+  fundamentals: { title: 'What Moves MCX Prices', slug: 'what-moves-mcx-prices' },
   psychology: { title: 'Trading Psychology', slug: 'trading-psychology' },
-  cfd: { title: 'Understanding Financial Markets', slug: 'understanding-financial-markets' },
-  ib: { title: 'Introducing Broker Fundamentals', slug: 'introducing-broker-fundamentals' },
-  chart: { title: 'Technical Analysis Essentials', slug: 'technical-analysis-essentials' },
-  instrument: { title: 'Understanding Currency Pairs', slug: 'understanding-currency-pairs' },
-  brief: { title: 'Fundamental Market Analysis', slug: 'fundamental-market-analysis' },
-  signals: { title: 'Risk Management Fundamentals', slug: 'risk-management-fundamentals' },
+  cfd: { title: 'MSC and MCX', slug: 'msc-and-mcx' },
+  ib: { title: 'Commodity Participants', slug: 'commodity-participants' },
+  chart: { title: 'Charts for MCX Commodities', slug: 'charts-for-mcx-commodities' },
+  instrument: { title: 'MCX Gold, Silver, Crude, and Copper', slug: 'mcx-gold-silver-crude-and-copper' },
+  brief: { title: 'What Moves MCX Prices', slug: 'what-moves-mcx-prices' },
+  signals: { title: 'Risk on MCX Contracts', slug: 'risk-management-fundamentals' },
 }
 
 export const INSTRUMENT_STUDY: Record<
   string,
   { product: string; howQuoted: string; whatMovesIt: string; studyFocus: string }
 > = {
-  EURUSD: {
-    product: 'EURUSD is a major FX pair: euro versus US dollar. On most retail platforms it is quoted to five decimal places, where the fourth decimal is the pip.',
-    howQuoted: 'If the quote is 1.08540, one euro costs 1.08540 dollars. The bid is the price a dealer will buy the base (EUR) from you; the ask is the price they will sell it to you. The gap is the spread — a cost, not a forecast.',
-    whatMovesIt: 'It often reacts to euro-area and US data: inflation, employment, and central-bank communication from the ECB and the Federal Reserve. Liquidity typically improves in the London–New York overlap.',
-    studyFocus: 'For study, mark session times, the next high-impact US or euro print, and whether you are looking at a demo or a live account. Do not treat a colour change on the candle as an instruction.',
+  NIFTY: {
+    product: 'NIFTY is the Nifty 50 cash index on the National Stock Exchange. The board uses the cash index, not a currency pair.',
+    howQuoted: 'The quote is in index points. A move of 40 points is a distance on that index. It is not a pip and it is not a rupee per share.',
+    whatMovesIt: 'The cash session, RBI and government headlines, and the large weights in the index usually matter more than an overseas forex clock. The useful window is about 09:15–15:30 IST.',
+    studyFocus: 'Name the timeframe, then the last swing in points. An example stop of about 40 points and a target of about 80 points is a study distance, not advice.',
   },
-  XAUUSD: {
-    product: 'XAUUSD is gold quoted against the US dollar. On CFD platforms the contract size and tick value are not the same as an FX pip. Always open the specification before talking about size.',
-    howQuoted: 'Gold can print in two decimals (for example 2645.30). A one-dollar move is not “one pip” in the FX sense. Overnight financing and spread behaviour around US hours belong in the product document.',
-    whatMovesIt: 'Learners usually track real yields, the US dollar, and risk-sentiment headlines. Moves can be fast around CPI, FOMC, and geopolitical news. Speed is a risk topic, not a reason to trade.',
-    studyFocus: 'On a gold chart, name the timeframe first, then the most recent swing high and swing low. Ask how wide that range is in dollars, then in account currency at a tiny size. That is literacy, not a call.',
+  BANKNIFTY: {
+    product: 'BANKNIFTY is the Nifty Bank cash index. It follows the large Indian banks on the NSE.',
+    howQuoted: 'Quoted in index points. Bank Nifty often moves more points than Nifty on the same day, so a Nifty distance is the wrong ruler.',
+    whatMovesIt: 'Bank results, credit headlines, and the NSE cash session. The index is closed after about 15:30 IST even if MCX metals are still trading.',
+    studyFocus: 'An example study distance is about 80 points to the stop and about 150 points to the target. Convert that into rupees only after you know the lot you would actually use.',
   },
-  GBPUSD: {
-    product: 'GBPUSD (cable) is pound sterling versus the US dollar. It can be more volatile than EURUSD around UK data and BoE events.',
-    howQuoted: 'Quoted like other dollar majors. Spreads often tighten in London hours and can jump around UK CPI, labour data, and MPC communication.',
-    whatMovesIt: 'UK inflation, growth, and Bank of England language, plus anything that moves the dollar. Thin holiday sessions can exaggerate wicks.',
-    studyFocus: 'Compare London morning structure with the New York overlap on the same timeframe. You are practising observation, not prediction.',
+  RELIANCE: {
+    product: 'RELIANCE is the NSE cash share of Reliance Industries.',
+    howQuoted: 'Quoted in rupees per share. The lot for delivery is one share; a derivatives lot is a different number on the contract sheet.',
+    whatMovesIt: 'Company results, energy headlines, and the broader Nifty session. The cash book is about 09:15–15:30 IST.',
+    studyFocus: 'Read the rupee price on the NSE quote. Do not convert it into a forex pair.',
   },
-  US30: {
-    product: 'US30 is a cash index CFD linked to the US 30 share benchmark. It follows US equity hours more than the FX calendar.',
-    howQuoted: 'Quoted in index points, not FX pips. Contract specs, min tick, and margin are platform-specific. Gaps around the cash-session open are a common educational example of overnight risk.',
-    whatMovesIt: 'US index CFDs often react to US economic data, earnings clusters, and Federal Reserve events. Overnight and weekend gaps are part of the product, not an anomaly.',
-    studyFocus: 'Note whether the chart is in the cash session or in off-hours. A quiet Asian print on an index CFD is not the same market as the US cash open.',
+  HDFCBANK: {
+    product: 'HDFCBANK is the NSE cash share of HDFC Bank.',
+    howQuoted: 'Quoted in rupees per share during the NSE cash session.',
+    whatMovesIt: 'Bank results and the same session that moves Bank Nifty.',
+    studyFocus: 'Keep the share price in rupees. A move in Bank Nifty is context, not the same quote.',
   },
-  NAS100: {
-    product: 'NAS100 is a cash index CFD linked to a large US technology-heavy benchmark. Volatility can be higher than the US 30 around mega-cap news.',
-    howQuoted: 'Point value and margin differ from FX. Confirm the specification. A 50-point swing is meaningless until you convert it to cash at a stated volume.',
-    whatMovesIt: 'US hours, mega-cap headlines, and rates narratives. Correlation with risk appetite can be strong — still not a signal.',
-    studyFocus: 'Practise converting a recent swing into account currency at 0.1 and 1.0 volume so you see why size dominates the chart.',
+  TCS: {
+    product: 'TCS is the NSE cash share of Tata Consultancy Services.',
+    howQuoted: 'Quoted in rupees per share.',
+    whatMovesIt: 'Quarterly results and the rupee often sit next to this chart. The session is NSE cash hours.',
+    studyFocus: 'Use the NSE close as the price. Do not describe the move in pips.',
   },
-  USOIL: {
-    product: 'USOIL is typically a WTI crude oil CFD. Energy products have their own inventory calendar, contract months, and financing.',
-    howQuoted: 'Quoted in dollars per barrel (and fractions). Tick value is not an FX pip. Some accounts use futures-style months — read the name of the symbol on the Market Watch.',
-    whatMovesIt: 'Weekly inventory data, OPEC headlines, USD moves, and supply disruptions. Spreads can widen in thin hours.',
-    studyFocus: 'Write down the symbol name, the contract unit, and the next scheduled inventory release. Product literacy comes before any chart story.',
+  SBIN: {
+    product: 'SBIN is the NSE cash share of State Bank of India.',
+    howQuoted: 'Quoted in rupees per share.',
+    whatMovesIt: 'Public-sector bank headlines and the NSE cash session.',
+    studyFocus: 'Stay on the rupee quote. Bank Nifty is a related index, not a substitute price.',
+  },
+  INFY: {
+    product: 'INFY is the NSE cash share of Infosys.',
+    howQuoted: 'Quoted in rupees per share.',
+    whatMovesIt: 'Results season and the rupee are the usual study points, inside NSE cash hours.',
+    studyFocus: 'Read the NSE close. A dollar chart of a US-listed name is a different market.',
+  },
+  GOLD: {
+    product: 'GOLD is the MCX continuous gold future. It is a rupee commodity contract, not XAUUSD.',
+    howQuoted: 'The main contract is commonly quoted in rupees per 10 grams. A move of 150 rupees is a price distance on that quote. Confirm the unit before talking about a lot.',
+    whatMovesIt: 'The domestic session, the overseas gold reference, and the rupee. MCX is often open from about 09:00 to 23:30 IST, which is longer than the NSE cash session.',
+    studyFocus: 'An example study stop is about 150 rupees and an example target is about 300 rupees from the close. Those numbers are examples on the quote, not a recommendation.',
+  },
+  SILVER: {
+    product: 'SILVER is the MCX continuous silver future.',
+    howQuoted: 'Commonly quoted in rupees per kilogram. Silver’s rupee distance is wider than gold’s, so a gold stop does not transfer.',
+    whatMovesIt: 'The same bullion session as MCX gold, plus industrial-demand headlines. Confirm the contract month if the screen is not the continuous symbol.',
+    studyFocus: 'An example study distance is about 400 rupees to the stop and about 800 rupees to the target.',
+  },
+  CRUDEOIL: {
+    product: 'CRUDEOIL is the MCX continuous crude oil future.',
+    howQuoted: 'Commonly quoted in rupees per barrel. Inventory week and the contract unit belong in the note before any size talk.',
+    whatMovesIt: 'Overseas crude headlines, the rupee, and the MCX evening session. NSE cash can already be closed while this contract is still printing.',
+    studyFocus: 'An example study stop is about 40 rupees and an example target is about 80 rupees.',
+  },
+  NATURALGAS: {
+    product: 'NATURALGAS is the MCX continuous natural-gas future.',
+    howQuoted: 'Quoted in rupees on the contract’s own unit. Read that unit on the sheet before comparing it with an overseas gas price.',
+    whatMovesIt: 'Storage headlines and the MCX energy session. The quote can travel farther, in percent, than crude on the same day.',
+    studyFocus: 'An example study stop is about 3 rupees and an example target is about 6 rupees on this quote.',
+  },
+  COPPER: {
+    product: 'COPPER is the MCX continuous copper future.',
+    howQuoted: 'Commonly quoted in rupees per kilogram.',
+    whatMovesIt: 'Industrial-demand headlines and the MCX base-metal session.',
+    studyFocus: 'An example study stop is about 8 rupees and an example target is about 15 rupees.',
   },
 }
 
@@ -67,38 +103,42 @@ export function instrumentSession(symbol?: string) {
   return instruments.find((item) => item.symbol === symbol)?.sessionNote
 }
 
-export const ORDER_NOTE = `A market order is a request to transact now at the available bid or ask. A limit waits for a more favourable price and may never fill. A stop becomes a market order when a trigger is reached — it is designed as a risk or entry mechanism, not a promise. Pending orders (buy limit, sell limit, buy stop, sell stop) are the same ideas parked on the ticket. None of them is a recommendation; they are tools on MetaTrader 5 and similar terminals.`
+export const ORDER_NOTE = `A market order is a request to transact now at the available bid or ask. A limit waits for a more favourable price and may never fill. A stop becomes a market order when a trigger is reached — it is a risk or entry mechanism, not a promise. On NSE cash the order is in shares. On MCX the order is in lots of a dated contract, and many contracts can go to delivery, so a study example squares off before expiry. None of these order types is a recommendation.`
 
-export const RISK_NOTE = `Leverage is a multiplier on exposure, not a bonus. Margin is collateral the platform holds while a position is open. If equity falls far enough, a stop-out can close positions automatically. A useful study drill: pick a tiny volume (for example 0.01 on FX), measure a recent swing in pips or points, and convert that swing into cash. Then repeat at 10× the volume. The chart did not change — the damage did.`
+export const RISK_NOTE = `On MCX, margin is SPAN plus exposure margin, and profit or loss is marked on the full lot, not on a pip. On NSE cash, the risk is the rupee move times the number of shares. A useful study drill: take the live close, apply a small example distance, and multiply by the lot or the share count. Then repeat at ten times the size. The chart did not change. The rupees did.`
 
-export const MT5_NOTE = `On MetaTrader 5, start with Market Watch (symbols), the chart (timeframe + template), and the Toolbox (Trade, History, Journal). Open a demo ticket: symbol, volume, market versus pending, then optional stop and limit prices. Keep one-click trading off until the ticket is comfortable. The Journal is the record of what the terminal actually sent — more reliable than memory.`
+export const MT5_NOTE = `On an NSE or MCX screen, start with the symbol, the exchange, and the quotation unit. Nifty is index points. A share is rupees per share. MCX gold is commonly rupees per 10 grams, silver per kilogram, and crude per barrel. Read the expiry before the chart. The contract note is the record of what was sent.`
 
-export const PAIRS_NOTE = `A pair is base/quote. In EURUSD the base is EUR. A five-digit FX quote uses the fourth decimal as the pip; gold and index CFDs do not. Majors include EURUSD, GBPUSD, USDJPY. Crosses omit the dollar (EURGBP). Exotics pair a major with a smaller currency and often have wider spreads. Always read the live bid/ask on the platform you would use, not a delayed screenshot.`
+export const PAIRS_NOTE = `This board does not use currency pairs. NIFTY and BANKNIFTY are NSE cash indexes in points. RELIANCE, HDFCBANK, TCS, SBIN, and INFY are NSE shares in rupees. GOLD, SILVER, CRUDEOIL, NATURALGAS, COPPER, ZINC, ALUMINIUM, LEAD, and NICKEL are MCX futures in rupees per the contract unit. Read the live close on this board, not a delayed overseas screenshot.`
 
-export const SESSION_NOTE = `The weekday FX market is a chain of regional sessions. A teaching model in UTC: Tokyo about 00:00–09:00, London 07:00–16:00, New York 12:00–21:00. Overlaps (especially London–New York) usually mean more quotes and tighter spreads. Index CFDs care more about the US cash session. Sitting out of a session is a valid educational choice.`
+export const SESSION_NOTE = `NSE cash trades about 09:15–15:30 IST. MCX non-agri contracts usually trade about 09:00–23:30 IST, so gold and crude can still be printing after the equity cash market has closed. Agricultural MCX hours are shorter. A holiday on the Indian calendar can close one book and leave the other open. Sitting out of a session is a valid study choice.`
 
 export const TA_NOTE = `Technical analysis here is a labelling language: swing high, swing low, range versus a series of higher highs, and whether an indicator is describing the past. Support and resistance are areas where price reacted before — they are not walls. Indicators such as RSI or a moving average summarise history; they do not authorise a trade. Timeframe first, then structure, then risk distance.`
 
-export const FUNDAMENTALS_NOTE = `A calendar is a study tool. High-impact prints (CPI, NFP, central-bank decisions) can gap prices and widen spreads. You do not need a forecast. You need to know which currencies or products are in focus, whether you are on demo or live, and that “no position” is an allowed outcome of reading the calendar.`
+export const FUNDAMENTALS_NOTE = `A calendar is a study tool. For NSE, company results, RBI decisions, and the budget can move the cash session. For MCX, inventory headlines, the overseas commodity reference, and the rupee can move the evening session. You do not need a forecast. You need the product, the session, and the fact that “no position” is an allowed outcome.`
 
 export const PSYCH_NOTE = `Charts invite action. Education asks you to delay it. Common traps: revenge after a loss, increasing size to “get it back”, and treating a demo win as a live edge. A written rule such as “I study this timeframe and I do not place a live order today” is more useful than a new indicator.`
 
-export const CFD_NOTE = `A CFD (contract for difference) tracks an underlying price without delivering the asset. You are exposed to the price difference, plus spread, possible commissions, and overnight financing. Oil, indices, and gold on retail platforms are usually CFDs. That is why the specification — not a YouTube chart — decides tick value.`
+export const CFD_NOTE = `NSE cash is the share or the index itself, traded about 09:15–15:30 IST. MCX is the commodity derivatives exchange: a gold, silver, crude, or metal future is a standardised contract in rupees, and many contracts can go to delivery. The quotation unit on the contract sheet decides what a one-rupee move is worth. A currency pair is a different market and is not on this board.`
 
 export function sessionClock(now = new Date()) {
-  const hour = now.getUTCHours() + now.getUTCMinutes() / 60
-  const tokyo = hour >= 0 && hour < 9
-  const london = hour >= 7 && hour < 16
-  const newYork = hour >= 12 && hour < 21
-  const parts: string[] = []
-  if (tokyo) parts.push('Tokyo hours are open on this teaching clock')
-  if (london) parts.push('London hours are open')
-  if (newYork) parts.push('New York hours are open')
-  if (!parts.length) parts.push('this UTC snapshot sits outside the main Tokyo/London/New York windows')
-  let overlap = 'No major overlap on this simplified clock.'
-  if (london && newYork) overlap = 'London and New York overlap — often the busiest FX window.'
-  else if (tokyo && london) overlap = 'Tokyo and London overlap — a common hand-over into Europe.'
-  return { hour, tokyo, london, newYork, summary: `${parts.join('; ')}. ${overlap}` }
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now)
+  const hour = Number(parts.find((item) => item.type === 'hour')?.value ?? 0)
+  const minute = Number(parts.find((item) => item.type === 'minute')?.value ?? 0)
+  const clock = hour + minute / 60
+  const nse = clock >= 9.25 && clock < 15.5
+  const mcx = clock >= 9 && clock < 23.5
+  const open: string[] = []
+  if (nse) open.push('NSE cash is open, about 09:15–15:30 IST')
+  if (mcx) open.push('MCX is open, about 09:00–23:30 IST')
+  if (!open.length) open.push('NSE cash and MCX are both closed on this IST clock')
+  const overlap = nse && mcx ? 'Both sessions overlap through the equity cash day.' : 'After 15:30 IST, MCX can still be open while NSE cash is closed.'
+  return { hour: clock, nse, mcx, summary: `${open.join('; ')}. ${overlap}` }
 }
 
 export function weekdayLabel(now = new Date()) {
@@ -107,6 +147,6 @@ export function weekdayLabel(now = new Date()) {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    timeZone: 'UTC',
+    timeZone: 'Asia/Kolkata',
   }).format(now)
 }

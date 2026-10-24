@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext'
+import { APP_SHORT_NAME } from '@/utils/constants'
 import { useToast } from '@/context/ToastContext'
 import { isSupabaseEnabled } from '@/services/backend'
 import { getSupabase } from '@/services/supabase'
@@ -74,9 +75,9 @@ export function CreditsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
-      <h1 className="text-2xl font-bold text-ink">Baazex deposits</h1>
+      <h1 className="text-2xl font-bold text-ink">{APP_SHORT_NAME} deposits</h1>
       <p className="mt-1 text-sm text-muted">
-        A deposit adds 15% of the dollar amount as engine questions. $100 adds 15 questions. The student must save that Baazex ID first.
+        A deposit adds 15% of the dollar amount as engine questions. $100 adds 15 questions. The student must save that {APP_SHORT_NAME} ID first.
       </p>
       {loading ? <p className="mt-6 text-sm text-muted">Loading…</p> : null}
       {!isSupabaseEnabled() ? (
@@ -85,7 +86,7 @@ export function CreditsPage() {
 
       <section className="mt-6 space-y-3 rounded-2xl border border-line bg-white p-4">
         <label className="block text-sm font-semibold text-ink">
-          Baazex ID
+          {APP_SHORT_NAME} ID
           <input className="mt-1 h-11 w-full rounded-xl border border-line bg-canvas px-3" value={baazexId} onChange={(event) => setBaazexId(event.target.value)} />
         </label>
         <label className="block text-sm font-semibold text-ink">
@@ -94,7 +95,7 @@ export function CreditsPage() {
         </label>
         <label className="block text-sm font-semibold text-ink">
           Deposit reference
-          <input className="mt-1 h-11 w-full rounded-xl border border-line bg-canvas px-3" placeholder="Transaction id from Baazex" value={reference} onChange={(event) => setReference(event.target.value)} />
+          <input className="mt-1 h-11 w-full rounded-xl border border-line bg-canvas px-3" placeholder={`Transaction id from ${APP_SHORT_NAME}`} value={reference} onChange={(event) => setReference(event.target.value)} />
         </label>
         <button type="button" className="h-11 rounded-xl bg-baazex px-4 font-semibold text-on-button disabled:opacity-60" disabled={saving} onClick={() => void save()}>
           {saving ? 'Adding…' : 'Add questions'}

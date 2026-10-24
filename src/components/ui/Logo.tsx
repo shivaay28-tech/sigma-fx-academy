@@ -3,8 +3,8 @@ import { APP_SHORT_NAME } from '@/utils/constants'
 import { cn } from '@/utils/cn'
 import { useId } from 'react'
 
-function usesWordmark(id: string) {
-  return id === 'baazex'
+function usesImageLogo(id: string) {
+  return id === 'baazex' || id === 'sigma-fx-academy'
 }
 
 export function Logo({
@@ -16,7 +16,7 @@ export function Logo({
   compact?: boolean
   className?: string
 }) {
-  if (usesWordmark(BRAND.id)) {
+  if (usesImageLogo(BRAND.id)) {
     if (compact) {
       return <img src="/brand/logo-mark.png" alt="" className={cn('h-9 w-9 object-contain', className)} />
     }
@@ -53,7 +53,7 @@ function TextLogo({
           />
           <path
             d="M7 28 13.5 21.5l4.2 3.4L24 16.5l5 4.6"
-            stroke="var(--color-ink)"
+            stroke="#ffffff"
             strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -61,19 +61,21 @@ function TextLogo({
           />
           <defs>
             <linearGradient id={markId} x1="9" y1="10" x2="28" y2="30">
-              <stop stopColor="var(--color-ink)" />
-              <stop offset="1" stopColor="var(--color-accent)" />
+              <stop stopColor="#ffffff" />
+              <stop offset="1" stopColor="var(--color-bright)" />
             </linearGradient>
           </defs>
         </svg>
       </span>
       {compact ? null : (
         <span className="leading-tight">
-          <span className="block text-[13px] font-extrabold tracking-tight text-ink">{APP_SHORT_NAME}</span>
+          <span className={cn('block text-[13px] font-extrabold tracking-tight', light ? 'text-white' : 'text-ink')}>
+            {APP_SHORT_NAME}
+          </span>
           <span
             className={cn(
               'block text-[11px] font-semibold tracking-[0.18em] uppercase',
-              light ? 'text-ink/80' : 'text-accent',
+              light ? 'text-white/80' : 'text-accent',
             )}
           >
             Academy

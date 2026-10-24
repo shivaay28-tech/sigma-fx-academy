@@ -41,7 +41,7 @@ export function CoursesPage() {
 
   return (
     <div>
-      <Seo title="Courses" description={`Browse ${APP_NAME} courses on forex, CFDs, analysis, risk, MetaTrader 5, and introducing broker education.`} />
+      <Seo title="Courses" description={`Browse ${APP_NAME} courses on MCX commodities, the spot market, charts, margin, and expiry.`} />
       <PhotoBanner
         image={media.hero}
         alt="Trading desk used as the course catalogue cover"

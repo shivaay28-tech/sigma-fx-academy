@@ -72,16 +72,35 @@ function loadAttempts() {
   return seedAttempts
 }
 
+function studyLabel(value: string) {
+  return value
+    .replaceAll('Introduction to Forex Trading', 'Introduction to MCX')
+    .replaceAll('Opening MT5 and reading the layout', 'Reading the MCX symbol')
+    .replaceAll('Technical Analysis Essentials', 'Charts for MCX Commodities')
+}
+
 function loadCertificates() {
   const stored = readJson<CertificateRecord[] | null>(STORAGE_KEYS.certificates, null)
-  if (stored) return stored
+  if (stored) {
+    const next = stored.map((item) => ({ ...item, courseName: studyLabel(item.courseName) }))
+    if (next.some((item, index) => item.courseName !== stored[index]?.courseName)) {
+      writeJson(STORAGE_KEYS.certificates, next)
+    }
+    return next
+  }
   writeJson(STORAGE_KEYS.certificates, seedCertificates)
   return seedCertificates
 }
 
 function loadActivity() {
   const stored = readJson<ActivityItem[] | null>(STORAGE_KEYS.activity, null)
-  if (stored) return stored
+  if (stored) {
+    const next = stored.map((item) => ({ ...item, detail: studyLabel(item.detail) }))
+    if (next.some((item, index) => item.detail !== stored[index]?.detail)) {
+      writeJson(STORAGE_KEYS.activity, next)
+    }
+    return next
+  }
   writeJson(STORAGE_KEYS.activity, seedActivity)
   return seedActivity
 }

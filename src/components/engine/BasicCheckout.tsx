@@ -3,8 +3,7 @@ import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { authService } from '@/services/auth'
-import { BAAZEX_ACCOUNT_URL } from '@/utils/constants'
-import { ExternalLink } from 'lucide-react'
+import { APP_SHORT_NAME } from '@/utils/constants'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,17 +25,17 @@ export function BasicCheckout() {
     }
     const trimmed = baazexId.trim()
     if (!trimmed) {
-      push('error', 'Enter your Baazex ID.')
+      push('error', `Enter your ${APP_SHORT_NAME} ID.`)
       return
     }
     setBusy(true)
     try {
       const saved = await authService.updateProfile(user.id, { baazexId: trimmed })
-      if (!saved) throw new Error('Could not save the Baazex ID.')
+      if (!saved) throw new Error(`Could not save the ${APP_SHORT_NAME} ID.`)
       await refresh()
-      push('success', 'Baazex ID saved')
+      push('success', `${APP_SHORT_NAME} ID saved`)
     } catch (error) {
-      push('error', error instanceof Error ? error.message : 'Could not save the Baazex ID.')
+      push('error', error instanceof Error ? error.message : `Could not save the ${APP_SHORT_NAME} ID.`)
     } finally {
       setBusy(false)
     }
@@ -45,7 +44,7 @@ export function BasicCheckout() {
   if (!user) {
     return (
       <div className="space-y-4">
-        <p className="text-sm leading-6 text-ink/80">Sign in to save a Baazex ID. Five engine questions are included.</p>
+        <p className="text-sm leading-6 text-ink/80">Sign in to save a {APP_SHORT_NAME} ID. Five engine questions are included.</p>
         <Button className="w-full" onClick={() => navigate('/login', { state: { from: '/engine' } })}>
           Sign in
         </Button>
@@ -56,28 +55,19 @@ export function BasicCheckout() {
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-ink/80">
-        Five engine questions are included. A Baazex deposit adds 15% of the amount as questions. A $100 deposit adds 15 questions.
+        Five engine questions are included. A {APP_SHORT_NAME} deposit adds 15% of the amount as questions. A $100 deposit adds 15 questions.
       </p>
-      <a
-        href={BAAZEX_ACCOUNT_URL}
-        className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-accent ring-1 ring-bright/50 transition hover:bg-bright/10"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Open a Baazex account
-        <ExternalLink className="h-4 w-4" aria-hidden />
-      </a>
       <div className="rounded-2xl bg-white p-3 ring-1 ring-line">
         <Input
-          label="Baazex ID"
-          placeholder="Your Baazex client ID"
+          label={`${APP_SHORT_NAME} ID`}
+          placeholder={`Your ${APP_SHORT_NAME} client ID`}
           value={baazexId}
           autoComplete="off"
           className="bg-canvas"
           onChange={(event) => setBaazexId(event.target.value)}
         />
         <Button className="mt-3 w-full" loading={busy} onClick={() => void save()}>
-          Save Baazex ID
+          Save {APP_SHORT_NAME} ID
         </Button>
       </div>
     </div>

@@ -100,10 +100,10 @@ async function quotesForKnown(symbols: readonly { symbol: string; ticker: string
 }
 
 function marketsFor(type?: string) {
-  if (type === 'forex') return ['forex', 'cfd', 'america', 'crypto']
-  if (type === 'crypto') return ['crypto', 'cfd', 'america', 'forex']
-  if (type === 'stock' || type === 'index') return ['america', 'cfd', 'forex', 'crypto']
-  return ['cfd', 'forex', 'america', 'crypto']
+  const kind = (type ?? '').toLowerCase()
+  if (kind === 'stock' || kind === 'index') return ['india', 'america', 'cfd', 'futures']
+  if (kind === 'futures' || kind === 'future') return ['futures', 'cfd', 'india']
+  return ['futures', 'india', 'cfd']
 }
 
 async function closeForTicker(ticker: string, type?: string) {

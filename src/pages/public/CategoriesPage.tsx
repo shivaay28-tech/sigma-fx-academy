@@ -12,7 +12,7 @@ export function CategoriesPage() {
 
   return (
     <div>
-      <Seo title="Course categories" description={`Explore ${APP_NAME} categories covering forex, markets, analysis, risk, psychology, MT5, and introducing brokers.`} />
+      <Seo title="Course categories" description={`Explore ${APP_NAME} categories covering MCX, the spot commodity market, charts, risk, and contract screens.`} />
       <PhotoBanner
         image={media.study}
         alt="A quiet briefing room used for academy study"

@@ -3,10 +3,10 @@ import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { authService } from '@/services/auth'
 import type { AiConversation } from '@/types'
-import { BAAZEX_ACCOUNT_URL } from '@/utils/constants'
+import { APP_SHORT_NAME } from '@/utils/constants'
 import { cn } from '@/utils/cn'
 import { formatDate } from '@/utils/format'
-import { ChevronLeft, ChevronRight, ExternalLink, MoreHorizontal, Plus, Search, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MoreHorizontal, Plus, Search, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -48,17 +48,17 @@ export function EngineSidebar({
     if (!user) return
     const trimmed = baazexId.trim()
     if (!trimmed) {
-      push('error', 'Enter your Baazex ID.')
+      push('error', `Enter your ${APP_SHORT_NAME} ID.`)
       return
     }
     setSavingId(true)
     try {
       const saved = await authService.updateProfile(user.id, { baazexId: trimmed })
-      if (!saved) throw new Error('Could not save the Baazex ID.')
+      if (!saved) throw new Error(`Could not save the ${APP_SHORT_NAME} ID.`)
       await refresh()
-      push('success', 'Baazex ID saved')
+      push('success', `${APP_SHORT_NAME} ID saved`)
     } catch (error) {
-      push('error', error instanceof Error ? error.message : 'Could not save the Baazex ID.')
+      push('error', error instanceof Error ? error.message : `Could not save the ${APP_SHORT_NAME} ID.`)
     } finally {
       setSavingId(false)
     }
@@ -161,15 +161,6 @@ export function EngineSidebar({
         )}
         {user && !collapsed ? (
           <div className="mt-2 space-y-2">
-            <a
-              href={BAAZEX_ACCOUNT_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-10 items-center justify-center gap-1.5 rounded-xl bg-white text-xs font-semibold text-accent ring-1 ring-white/80 transition hover:bg-white/80"
-            >
-              Open a Baazex account
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            </a>
             <form
               className="space-y-2"
               onSubmit={(event) => {
@@ -178,9 +169,9 @@ export function EngineSidebar({
               }}
             >
               <input
-                aria-label="Baazex ID"
+                aria-label={`${APP_SHORT_NAME} ID`}
                 className="h-10 w-full rounded-xl border border-white/80 bg-white px-3 text-xs text-ink outline-none placeholder:text-muted focus:border-bright"
-                placeholder="Baazex ID"
+                placeholder={`${APP_SHORT_NAME} ID`}
                 value={baazexId}
                 onChange={(event) => setBaazexId(event.target.value)}
               />
@@ -189,7 +180,7 @@ export function EngineSidebar({
                 className="h-10 w-full rounded-xl bg-baazex text-xs font-semibold text-on-button disabled:opacity-60"
                 disabled={savingId}
               >
-                {savingId ? 'Saving…' : 'Save Baazex ID'}
+                {savingId ? 'Saving…' : `Save ${APP_SHORT_NAME} ID`}
               </button>
             </form>
           </div>

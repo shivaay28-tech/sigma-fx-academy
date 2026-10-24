@@ -17,13 +17,13 @@ export const faqs: FaqItem[] = [
     id: 'faq-3',
     question: 'Are the courses suitable for beginners?',
     answer:
-      'Yes. Several courses start from first principles, including currency pairs, order types, and MetaTrader 5 navigation. Intermediate and advanced modules are clearly labelled so you can choose an appropriate path.',
+      'Yes. Several courses start from first principles, including what MCX is, how gold and crude are quoted, and how an order ticket is read. Intermediate and advanced modules are clearly labelled so you can choose an appropriate path.',
   },
   {
     id: 'faq-4',
     question: 'Will completing a course make me a profitable trader?',
     answer:
-      'No programme can promise trading results. Education can improve your understanding of markets and risk, but forex and CFD trading can result in the loss of capital. Past study is not a predictor of future performance.',
+      'No programme can promise trading results. Education can improve your understanding of MCX contracts and risk, but commodity derivatives can result in the loss of capital. Past study is not a predictor of future performance.',
   },
   {
     id: 'faq-5',

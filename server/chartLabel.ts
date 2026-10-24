@@ -40,7 +40,7 @@ function intervalLabel(token: string) {
 function headerInterval(text: string) {
   const upper = text.toUpperCase()
   const match = upper.match(
-    /(?:DOLLAR|XAUUSD|XAGUSD|EURUSD|GBPUSD|USDJPY|BTCUSD|ETHUSD|SPOT)\W{0,8}(1D|1W|4H|1H|30M|15M|5M|1M|240|60|30|15|5|1)(?!\d)/,
+    /(?:NIFTY|BANKNIFTY|GOLD|SILVER|CRUDEOIL|CRUDE|COPPER)\W{0,8}(1D|1W|4H|1H|30M|15M|5M|1M|240|60|30|15|5|1)(?!\d)/,
   )
   return match?.[1] ? intervalLabel(match[1]) : undefined
 }
@@ -65,9 +65,11 @@ function symbolFromText(text: string) {
     if (index >= 0 && (best === undefined || index < best.index)) best = { symbol: item.symbol, index }
   }
   if (best) return best.symbol
-  if (compact.includes('XAU') || compact.includes('GOLD')) return 'XAUUSD'
-  if (compact.includes('XAG') || compact.includes('SILVER')) return 'XAGUSD'
-  if (compact.includes('SPOT') && compact.includes('DOLLAR')) return 'XAUUSD'
+  if (compact.includes('BANKNIFTY') || compact.includes('NIFTYBANK')) return 'BANKNIFTY'
+  if (compact.includes('NIFTY')) return 'NIFTY'
+  if (compact.includes('XAU') || compact.includes('GOLD')) return 'GOLD'
+  if (compact.includes('XAG') || compact.includes('SILVER')) return 'SILVER'
+  if (compact.includes('CRUDE')) return 'CRUDEOIL'
   return undefined
 }
 

@@ -9,15 +9,13 @@ export interface LiveQuote {
   ask: number
 }
 
-const INDEXES = new Set(['US30', 'NAS100', 'US500', 'GER40', 'UK100', 'JP225'])
+const INDEXES = new Set(['NIFTY', 'BANKNIFTY'])
 
 export function formatLiveQuote(symbol: string, value: number) {
   const upper = symbol.toUpperCase()
-  if (upper === 'XAGUSD' || (upper.endsWith('JPY') && upper.length === 6)) return value.toFixed(3)
-  if (upper === 'XAUUSD' || upper.endsWith('OIL')) return value.toFixed(2)
-  if (INDEXES.has(upper)) return value.toFixed(1)
-  if (/^[A-Z]{6}$/.test(upper)) return value.toFixed(5)
-  if (value >= 100) return value.toFixed(1)
+  if (INDEXES.has(upper)) return value.toFixed(2)
+  if (upper === 'NATURALGAS' || upper === 'CRUDEOIL') return value.toFixed(2)
+  if (value >= 1000) return value.toFixed(1)
   return value.toFixed(2)
 }
 

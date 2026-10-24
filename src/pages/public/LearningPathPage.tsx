@@ -10,23 +10,23 @@ import { APP_NAME } from '@/utils/constants'
 const stages = [
   {
     title: 'Stage 1 · Foundations',
-    text: 'Learn how the market is organised, how pairs are quoted, and how orders are described.',
-    slugs: ['introduction-to-forex-trading', 'understanding-currency-pairs', 'how-buy-and-sell-orders-work'],
+    text: 'Learn how MCX is organised, how gold, silver, and crude are quoted, and how orders and expiry work.',
+    slugs: ['introduction-to-mcx', 'mcx-gold-silver-crude-and-copper', 'mcx-orders-and-expiry'],
   },
   {
-    title: 'Stage 2 · Platform and product math',
-    text: 'Connect pip value, lots, leverage, and the MetaTrader 5 workspace.',
-    slugs: ['pips-lots-leverage-and-margin', 'introduction-to-metatrader-5'],
+    title: 'Stage 2 · Contract math and the screen',
+    text: 'Connect lot size, margin, mark-to-market, and the MCX trading screen.',
+    slugs: ['mcx-lots-margin-and-mark-to-market', 'the-mcx-trading-screen'],
   },
   {
     title: 'Stage 3 · Analysis',
     text: 'Describe charts and economic information without treating either as a forecast.',
-    slugs: ['technical-analysis-essentials', 'fundamental-market-analysis'],
+    slugs: ['charts-for-mcx-commodities', 'what-moves-mcx-prices'],
   },
   {
     title: 'Stage 4 · Conduct',
     text: 'Risk, psychology, and introducing-broker standards for professional communication.',
-    slugs: ['risk-management-fundamentals', 'trading-psychology', 'introducing-broker-fundamentals'],
+    slugs: ['risk-management-fundamentals', 'trading-psychology', 'commodity-participants', 'msc-and-mcx'],
   },
 ]
 
@@ -35,7 +35,7 @@ export function LearningPathPage() {
 
   return (
     <div>
-      <Seo title="Learning path" description={`A suggested ${APP_NAME} sequence from forex foundations to analysis, risk, and partner education.`} />
+      <Seo title="Learning path" description={`A suggested ${APP_NAME} sequence from MCX foundations to charts, risk, and the spot commodity market.`} />
       <PhotoBanner
         image={media.study}
         alt="A study table prepared for a structured learning path"

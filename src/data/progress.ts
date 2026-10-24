@@ -116,7 +116,7 @@ export const seedCertificates: CertificateRecord[] = [
     userId: 'user-demo-student',
     courseId: 'course-forex-intro',
     studentName: 'Amina Al Hashimi',
-    courseName: 'Introduction to Forex Trading',
+    courseName: 'Introduction to MCX',
     completedAt: '2026-08-02T10:30:00.000Z',
   },
 ]
@@ -127,7 +127,7 @@ export const seedActivity: ActivityItem[] = [
     userId: 'user-demo-student',
     type: 'certificate',
     label: 'Certificate issued',
-    detail: 'Introduction to Forex Trading',
+    detail: 'Introduction to MCX',
     at: '2026-08-02T10:30:00.000Z',
   },
   {
@@ -135,7 +135,7 @@ export const seedActivity: ActivityItem[] = [
     userId: 'user-demo-student',
     type: 'lesson',
     label: 'Lesson completed',
-    detail: 'Opening MT5 and reading the layout',
+    detail: 'Reading the MCX symbol',
     at: '2026-08-21T07:15:00.000Z',
   },
   {
@@ -143,7 +143,7 @@ export const seedActivity: ActivityItem[] = [
     userId: 'user-demo-student',
     type: 'enroll',
     label: 'Enrolled in a course',
-    detail: 'Technical Analysis Essentials',
+    detail: 'Charts for MCX Commodities',
     at: '2026-09-02T09:00:00.000Z',
   },
 ]

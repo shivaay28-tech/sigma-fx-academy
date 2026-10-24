@@ -17,7 +17,7 @@ export function AboutPage() {
       />
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
       <p className="text-base leading-relaxed text-muted">
-        {APP_NAME} is the learning platform of {COMPANY_NAME}. It exists to explain how forex and CFD markets are organised, how platforms such as MetaTrader 5 present information, and why risk belongs at the centre of every conversation about trading.
+        {APP_NAME} is the learning platform of {COMPANY_NAME}. It explains MCX commodity futures — gold, silver, crude oil, natural gas, and metals — the spot commodity market beside them, and why margin, expiry, and delivery belong in every conversation.
       </p>
       <p className="mt-4 text-base leading-relaxed text-muted">
         The Academy is not a signal room, a portfolio service, or a promise of income. Courses, quizzes, and certificates record study. They do not qualify anyone to trade, advise others, or expect a particular financial result.

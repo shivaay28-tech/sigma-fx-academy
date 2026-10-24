@@ -82,7 +82,7 @@ export function EngineComposer({
             onSubmit(event, event.currentTarget.value)
           }
         }}
-        placeholder="Ask anything about markets, charts, MT5, or risk…"
+        placeholder="Ask anything about MCX, gold, crude, or risk…"
         rows={2}
         disabled={disabled}
         className="w-full resize-none bg-transparent px-2 pt-1 text-sm text-ink outline-none placeholder:text-muted"

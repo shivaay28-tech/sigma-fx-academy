@@ -15,13 +15,11 @@ import { formatLiveQuote, tradingViewService, type LiveQuote } from '@/services/
 import type { AiAttachment, AiConversation } from '@/types'
 import { media } from '@/data/media'
 import { APP_NAME, DISCLAIMER, ENGINE_NAME } from '@/utils/constants'
-import { pageBackgroundStyle } from '@/utils/pageBackground'
 import { analysisTitle, uid } from '@/utils/format'
 import { Camera, Clapperboard, Copy, Menu, MonitorUp, NotebookPen, RefreshCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react'
-import { useLocation } from 'react-router-dom'
+
 export function EnginePage() {
-  const { pathname } = useLocation()
   const { user } = useAuth()
   const { push } = useToast()
   const [collapsed, setCollapsed] = useState(false)
@@ -29,7 +27,7 @@ export function EnginePage() {
   const [activeId, setActiveId] = useState<string | undefined>(conversations[0]?.id)
   const [query, setQuery] = useState('')
   const [draft, setDraft] = useState('')
-  const [instrument, setInstrument] = useState('EURUSD')
+  const [instrument, setInstrument] = useState('NIFTY')
   const [quotes, setQuotes] = useState<LiveQuote[]>([])
   const quotesRef = useRef<LiveQuote[]>([])
   quotesRef.current = quotes
@@ -73,7 +71,7 @@ export function EnginePage() {
     setActiveId(conversation.id)
     setDraft('')
     setPendingFiles([])
-    setInstrument('EURUSD')
+    setInstrument('NIFTY')
   }, [])
 
   useEffect(() => {
@@ -553,7 +551,7 @@ export function EnginePage() {
   }
 
   return (
-    <div className="atmosphere bg-page flex h-dvh max-w-full overflow-hidden text-ink" style={pageBackgroundStyle(pathname)}>
+    <div className="atmosphere flex h-dvh max-w-full overflow-hidden text-ink">
       <Seo
         title="AI Engine"
         description={`${APP_NAME} AI Engine — educational chart and market-literacy assistant. Not investment advice.`}
@@ -654,14 +652,14 @@ export function EnginePage() {
                 Pick a symbol. The engine uses the live TradingView price for the entry, stop, and target.
               </p>
               <div className="mt-6 grid w-full grid-cols-2 gap-2.5 sm:mt-8 sm:gap-3">
-                <ActionCard icon={MonitorUp} title="Share my screen" text="Live read of your MT5 or TradingView chart" onClick={shareScreen} />
+                <ActionCard icon={MonitorUp} title="Share my screen" text="Live read of your MCX or TradingView chart" onClick={shareScreen} />
                 <ActionCard icon={Camera} title="Upload a chart" text="Screenshot from any platform" onClick={() => fileRef.current?.click()} />
                 <ActionCard icon={Clapperboard} title="Send a video" text="I sample frames across the clip" onClick={() => videoRef.current?.click()} />
                 <ActionCard
                   icon={NotebookPen}
                   title="Today's brief"
                   text="Sessions, calendar risk and study focus"
-                  onClick={() => void sendPrompt('Give me a directional call on EURUSD, XAUUSD, and US30 for H1 using the live TradingView prices in this message.')}
+                  onClick={() => void sendPrompt('Give me a directional call on NIFTY, BANKNIFTY, and GOLD for H1 using the live TradingView prices in this message.')}
                 />
               </div>
               <p className="mt-6 hidden max-w-2xl text-[11px] leading-relaxed text-muted sm:block">{DISCLAIMER}</p>
@@ -727,7 +725,7 @@ export function EnginePage() {
               ) : null}
               {!sending && active && active.messages.some((item) => item.role === 'assistant') ? (
                 <div className="flex flex-wrap gap-2">
-                  {['Explain that more simply', 'Give me an MT5 example', 'What should I study next?'].map((item) => (
+                  {['Explain that more simply', 'Give me an MCX example', 'What should I study next?'].map((item) => (
                     <button
                       key={item}
                       type="button"
@@ -744,7 +742,7 @@ export function EnginePage() {
         </div>
 
         <div className="border-t border-line px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-4 sm:py-3">
-          <LiveMarket symbol={instrument ?? 'EURUSD'} quotes={quotes} onSelect={setInstrument} />
+          <LiveMarket symbol={instrument ?? 'NIFTY'} quotes={quotes} onSelect={setInstrument} />
           <div className="mx-auto mb-3 hidden max-w-3xl gap-1.5 overflow-x-auto pb-1 sm:flex">
             {instruments.map((item) => (
               <button
