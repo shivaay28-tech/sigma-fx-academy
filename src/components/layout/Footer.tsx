@@ -19,7 +19,7 @@ const columns = [
     links: [
       { to: '/categories', label: 'Categories' },
       { to: '/courses/introduction-to-mcx', label: 'Introduction to MCX' },
-      { to: '/courses/msc-and-mcx', label: 'MSC and MCX' },
+      { to: '/courses/nsc-and-mcx', label: 'NSC and MCX' },
       { to: '/courses/risk-management-fundamentals', label: 'Risk management' },
     ],
   },

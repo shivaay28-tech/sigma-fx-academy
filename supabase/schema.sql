@@ -211,6 +211,32 @@ declare
   course jsonb;
   quiz jsonb;
 begin
+  -- Existing academies keep their catalogue, but replace the old MSC labels with NSC.
+  update public.categories
+    set slug = replace(slug, 'msc-', 'nsc-'),
+        name = replace(name, 'MSC', 'NSC'),
+        description = replace(description, 'MSC', 'NSC')
+    where slug like '%msc%' or name like '%MSC%' or description like '%MSC%';
+
+  update public.courses
+    set slug = replace(slug, 'msc-', 'nsc-'),
+        title = replace(title, 'MSC', 'NSC'),
+        subtitle = replace(subtitle, 'MSC', 'NSC'),
+        description = replace(description, 'MSC', 'NSC'),
+        objectives = replace(objectives::text, 'MSC', 'NSC')::jsonb,
+        modules = replace(replace(modules::text, 'msc-', 'nsc-'), 'MSC', 'NSC')::jsonb
+    where slug like '%msc%'
+       or title like '%MSC%'
+       or description like '%MSC%'
+       or objectives::text like '%MSC%'
+       or modules::text like '%MSC%'
+       or modules::text like '%msc-%';
+
+  update public.quizzes
+    set title = replace(title, 'MSC', 'NSC'),
+        questions = replace(questions::text, 'MSC', 'NSC')::jsonb
+    where title like '%MSC%' or questions::text like '%MSC%';
+
   if exists (select 1 from public.courses limit 1) then
     return;
   end if;

@@ -65,7 +65,7 @@ const why = [
 
 const steps = [
   { step: '01', title: 'Create a free account', text: 'Register with your name, email, mobile, and country.' },
-  { step: '02', title: 'Choose a learning path', text: 'Start with MCX basics or the MSC and MCX comparison, then move to a labelled intermediate topic.' },
+  { step: '02', title: 'Choose a learning path', text: 'Start with MCX basics or the NSC and MCX comparison, then move to a labelled intermediate topic.' },
   { step: '03', title: 'Study lessons and notes', text: 'Watch the media placeholder, read the material, and keep private notes.' },
   { step: '04', title: 'Check understanding', text: 'Pass the quiz at 70% to complete the course and receive a sample certificate.' },
 ]
@@ -238,7 +238,7 @@ export function HomePage() {
             <div className="mt-6 space-y-4">
               <ProgressBar value={72} label="Introduction to MCX" />
               <ProgressBar value={40} label="MCX Gold, Silver, Crude, and Copper" />
-              <ProgressBar value={18} label="MSC and MCX" />
+              <ProgressBar value={18} label="NSC and MCX" />
             </div>
             <Link to="/register" className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent">
               Create an account to save progress <ArrowRight className="h-4 w-4" />

@@ -26,7 +26,7 @@ const stages = [
   {
     title: 'Stage 4 · Conduct',
     text: 'Risk, psychology, and introducing-broker standards for professional communication.',
-    slugs: ['risk-management-fundamentals', 'trading-psychology', 'commodity-participants', 'msc-and-mcx'],
+    slugs: ['risk-management-fundamentals', 'trading-psychology', 'commodity-participants', 'nsc-and-mcx'],
   },
 ]
 

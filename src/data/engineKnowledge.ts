@@ -9,7 +9,7 @@ export const TOPIC_COURSES: Record<string, { title: string; slug: string }> = {
   ta: { title: 'Charts for MCX Commodities', slug: 'charts-for-mcx-commodities' },
   fundamentals: { title: 'What Moves MCX Prices', slug: 'what-moves-mcx-prices' },
   psychology: { title: 'Trading Psychology', slug: 'trading-psychology' },
-  cfd: { title: 'MSC and MCX', slug: 'msc-and-mcx' },
+  cfd: { title: 'NSC and MCX', slug: 'nsc-and-mcx' },
   ib: { title: 'Commodity Participants', slug: 'commodity-participants' },
   chart: { title: 'Charts for MCX Commodities', slug: 'charts-for-mcx-commodities' },
   instrument: { title: 'MCX Gold, Silver, Crude, and Copper', slug: 'mcx-gold-silver-crude-and-copper' },

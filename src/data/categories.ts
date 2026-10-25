@@ -12,9 +12,9 @@ export const categories: Category[] = [
   },
   {
     id: 'cat-markets',
-    slug: 'msc-and-mcx',
-    name: 'MSC and MCX',
-    description: 'Compare the spot commodity market (MSC in these lessons) with MCX futures and options, including participants, sessions, and why a rupee quote is not a forex pair.',
+    slug: 'nsc-and-mcx',
+    name: 'NSC and MCX',
+    description: 'Compare the spot commodity market (NSC in these lessons) with MCX futures and options, including participants, sessions, and why a rupee quote is not a forex pair.',
     icon: 'globe',
     difficulty: 'Beginner',
     estimatedHours: 3,

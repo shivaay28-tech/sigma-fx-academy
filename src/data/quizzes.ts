@@ -82,7 +82,7 @@ export const seedQuizzes: Quiz[] = [
         [
           'How to trade EUR/USD',
           'A guaranteed daily income from gold',
-          'MSC, the spot commodity market, and MCX derivatives — not forex',
+          'NSC, the spot commodity market, and MCX derivatives — not forex',
           'Only share prices',
         ],
         2,
@@ -592,12 +592,12 @@ export const seedQuizzes: Quiz[] = [
   {
     id: 'quiz-markets',
     courseId: 'course-markets',
-    title: 'MSC and MCX — knowledge check',
+    title: 'NSC and MCX — knowledge check',
     passingScore: PASSING_SCORE,
     questions: [
       q(
         'mkt1',
-        'In these lessons, MSC means:',
+        'In these lessons, NSC means:',
         [
           'The spot commodity market, where the physical good is bought for near delivery',
           'A forex session',
@@ -605,7 +605,7 @@ export const seedQuizzes: Quiz[] = [
           'MetaTrader',
         ],
         0,
-        'MSC is the academy’s name for the cash commodity market. It is not a currency market, and it is not claimed to be a separate SEBI exchange.',
+        'NSC is the academy’s name for the cash commodity market. It is not a currency market, and it is not claimed to be a separate SEBI exchange.',
       ),
       q(
         'mkt2',

@@ -7,7 +7,7 @@ export const COMPANY_NAME = BRAND.company
 export const COMPANY_URL = BRAND.url
 export const COMPANY_HOST = BRAND.host
 export const PASSING_SCORE = 70
-export const CATALOG_SEED_VERSION = 2
+export const CATALOG_SEED_VERSION = 3
 
 export const DISCLAIMER = `Trading commodity derivatives on MCX involves significant risk and may not be suitable for all investors. ${APP_NAME} content is provided for educational purposes only and does not constitute investment advice, a recommendation, or a guarantee of trading results.`
 

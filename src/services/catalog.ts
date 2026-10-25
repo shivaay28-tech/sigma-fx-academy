@@ -62,6 +62,24 @@ function asRow(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
 }
 
+function stillSaysMsc(value: unknown) {
+  const text = JSON.stringify(value)
+  return text.includes('MSC') || text.includes('msc-')
+}
+
+function preferCurrentSeed<T extends { id: string }>(remote: T[], seed: T[]) {
+  const byId = new Map(seed.map((item) => [item.id, item]))
+  const merged = remote.map((item) => {
+    const current = byId.get(item.id)
+    return current && stillSaysMsc(item) ? current : item
+  })
+  const seen = new Set(remote.map((item) => item.id))
+  for (const item of seed) {
+    if (!seen.has(item.id)) merged.push(item)
+  }
+  return merged
+}
+
 async function fetchCatalog() {
   const sb = getSupabase()
   await sb.rpc('ensure_catalog_seed', {
@@ -75,8 +93,8 @@ async function fetchCatalog() {
     sb.from('courses').select('*').order('title'),
     sb.from('quizzes').select('*'),
   ])
-  courseCache = (courseRows ?? []).map((row) => mapCourse(asRow(row)))
-  quizCache = (quizRows ?? []).map((row) => mapQuiz(asRow(row)))
+  courseCache = preferCurrentSeed((courseRows ?? []).map((row) => mapCourse(asRow(row))), seedCourses)
+  quizCache = preferCurrentSeed((quizRows ?? []).map((row) => mapQuiz(asRow(row))), seedQuizzes)
   hydrated = true
 }
 

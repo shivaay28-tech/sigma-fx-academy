@@ -93,7 +93,7 @@ export const seedCourses: Course[] = [
           [
             'A forex pair such as EUR/USD is an exchange rate between two currencies. An MCX gold future is a standardised claim on a quantity of gold, quoted in Indian rupees, usually per 10 grams for the main gold contract. Silver is commonly quoted per kilogram, and crude oil per barrel. Always confirm the unit on the contract note, because mini contracts use the same unit with a smaller lot.',
             'International prices still matter. COMEX gold and NYMEX crude are reference markets, and the rupee–dollar rate changes how an overseas price prints in India. That is a conversion, not a reason to study forex pairs as the subject of this academy.',
-            `${APP_NAME} courses stay on MSC and MCX: the spot commodity and the exchange contract. They do not teach currency trading.`,
+            `${APP_NAME} courses stay on NSC and MCX: the spot commodity and the exchange contract. They do not teach currency trading.`,
           ],
         ),
       ]),
@@ -821,16 +821,16 @@ export const seedCourses: Course[] = [
   },
   {
     id: 'course-markets',
-    slug: 'msc-and-mcx',
-    title: 'MSC and MCX',
+    slug: 'nsc-and-mcx',
+    title: 'NSC and MCX',
     subtitle: 'The spot commodity market beside the exchange.',
     description:
-      'MSC in these lessons means the spot commodity market, where the physical good is bought and sold for near delivery. MCX is the derivatives exchange. The course compares the two and leaves forex out.',
+      'NSC in these lessons means the spot commodity market, where the physical good is bought and sold for near delivery. MCX is the derivatives exchange. The course compares the two and leaves forex out.',
     categoryId: 'cat-markets',
     difficulty: 'Beginner',
     durationHours: 2,
     objectives: [
-      'Define MSC, as used here, as the spot commodity market',
+      'Define NSC, as used here, as the spot commodity market',
       'Define MCX as the futures and options exchange',
       'Explain why the two prices can differ',
       'Say clearly that neither topic is forex',
@@ -844,15 +844,15 @@ export const seedCourses: Course[] = [
       module('mod-mkt-1', 'Two markets', 1, [
         lesson(
           'l-mkt-1',
-          'what-msc-means',
-          'What MSC means in this academy',
+          'what-nsc-means',
+          'What NSC means in this academy',
           14,
           1,
-          'MSC is the spot commodity market: the cash market for the physical good.',
+          'NSC is the spot commodity market: the cash market for the physical good.',
           [
-            'In these courses, MSC means the spot, or cash, commodity market. That is where gold, silver, crude oil, or a metal changes hands for near-term delivery in the physical trade. A bullion dealer’s price, a local mandi, or an imported parcel are spot conversations. They are not currency pairs.',
-            'The spot price and the MCX future are related and they are not identical. Quality, place, taxes, and time create a gap. That gap is the basis. Studying the basis is the point of putting MSC and MCX in one course.',
-            'This name is the academy’s teaching label for the cash market. It is not a claim that “MSC” is a separate SEBI-licensed exchange. The licensed derivatives venue in these lessons is MCX.',
+            'In these courses, NSC means the spot, or cash, commodity market. That is where gold, silver, crude oil, or a metal changes hands for near-term delivery in the physical trade. A bullion dealer’s price, a local mandi, or an imported parcel are spot conversations. They are not currency pairs.',
+            'The spot price and the MCX future are related and they are not identical. Quality, place, taxes, and time create a gap. That gap is the basis. Studying the basis is the point of putting NSC and MCX in one course.',
+            'This name is the academy’s teaching label for the cash market. It is not a claim that “NSC” is a separate SEBI-licensed exchange. The licensed derivatives venue in these lessons is MCX.',
           ],
         ),
         lesson(
@@ -891,7 +891,7 @@ export const seedCourses: Course[] = [
           4,
           'The subject is a commodity. The quote is in rupees per unit of that commodity.',
           [
-            'Forex is a market in currencies. MSC and MCX, as taught here, are markets in commodities. Gold per 10 grams, silver per kilogram, crude per barrel, copper in its contract unit. The skills that transfer are general ones: reading a specification, respecting margin, and not promising a result. The products do not transfer.',
+            'Forex is a market in currencies. NSC and MCX, as taught here, are markets in commodities. Gold per 10 grams, silver per kilogram, crude per barrel, copper in its contract unit. The skills that transfer are general ones: reading a specification, respecting margin, and not promising a result. The products do not transfer.',
             'A rupee–dollar rate can change an MCX quote because the overseas commodity is priced in dollars. Noticing that is part of commodity education. Opening a currency position is a different product and is outside this catalogue.',
             `${APP_NAME} will keep later lessons on these contracts. If a page still sounds like a currency course, it is out of date.`,
           ],
