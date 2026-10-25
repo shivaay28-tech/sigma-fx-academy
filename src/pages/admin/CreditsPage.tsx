@@ -63,7 +63,7 @@ export function CreditsPage() {
       })
       const body = (await response.json().catch(() => ({}))) as { error?: string; questions?: number; fullName?: string }
       if (!response.ok) throw new Error(body.error || 'Could not record the deposit.')
-      push('success', 'Credit added', `${body.questions ?? 0} credits for ${body.fullName || baazexId}.`)
+      push('success', 'Points added', `${body.questions ?? 0} points for ${body.fullName || baazexId}.`)
       setReference('')
       await reload()
     } catch (error) {
@@ -77,7 +77,7 @@ export function CreditsPage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       <h1 className="text-2xl font-bold text-ink">{APP_SHORT_NAME} deposits</h1>
       <p className="mt-1 text-sm text-muted">
-        A deposit adds 15% of the rupee amount as engine credit. ₹100 adds 15 credits. The student must save that {APP_SHORT_NAME} ID first.
+        A deposit adds 15% of the rupee amount as points. ₹100 adds 15 points. One engine question uses 10 points. The student must save that {APP_SHORT_NAME} ID first.
       </p>
       {loading ? <p className="mt-6 text-sm text-muted">Loading…</p> : null}
       {!isSupabaseEnabled() ? (
@@ -109,7 +109,7 @@ export function CreditsPage() {
           {deposits.map((item) => (
             <li key={item.id} className="rounded-2xl border border-line bg-white p-4">
               <p className="font-semibold text-ink">{item.baazexId}</p>
-              <p className="text-sm text-muted">₹{item.amountUsd} · {item.questionsAdded} credits · {item.reference}</p>
+              <p className="text-sm text-muted">₹{item.amountUsd} · {item.questionsAdded} points · {item.reference}</p>
             </li>
           ))}
         </ul>

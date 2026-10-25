@@ -310,7 +310,7 @@ begin
     raise exception 'Not authenticated';
   end if;
   update public.profiles
-    set questions_used = questions_used + 1
+    set questions_used = questions_used + 10
     where id = auth.uid()
     returning questions_used into used;
   return coalesce(used, 0);

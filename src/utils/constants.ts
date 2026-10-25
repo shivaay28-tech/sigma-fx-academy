@@ -30,6 +30,7 @@ export const STORAGE_KEYS = {
 } as const
 
 export const FREE_QUESTIONS = 5
+export const POINTS_PER_QUESTION = 10
 export const BASIC_QUESTIONS = 200
 export const BASIC_PRICE = 30
 

@@ -14,7 +14,7 @@ import { conversationService, newMessage } from '@/services/conversations'
 import { formatLiveQuote, tradingViewService, type LiveQuote } from '@/services/tradingView'
 import type { AiAttachment, AiConversation } from '@/types'
 import { media } from '@/data/media'
-import { APP_NAME, DISCLAIMER, ENGINE_NAME } from '@/utils/constants'
+import { APP_NAME, DISCLAIMER, ENGINE_NAME, POINTS_PER_QUESTION } from '@/utils/constants'
 import { analysisTitle, uid } from '@/utils/format'
 import { Camera, Clapperboard, Copy, Menu, MonitorUp, NotebookPen, RefreshCw } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react'
@@ -465,7 +465,7 @@ export function EnginePage() {
     const display = screenStreamRef.current
     const video = screenCaptureRef.current
     if (!display || !video) return
-    if (remaining <= 0) {
+    if (remaining < POINTS_PER_QUESTION) {
       window.focus()
       setCreditsOpen(true)
       return
@@ -503,7 +503,7 @@ export function EnginePage() {
 
   async function sendPrompt(prompt: string, attachments = pendingFiles) {
     if (sendingRef.current) return
-    if (remaining <= 0) {
+    if (remaining < POINTS_PER_QUESTION) {
       setCreditsOpen(true)
       return
     }
@@ -620,7 +620,7 @@ export function EnginePage() {
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <span className="rounded-full border border-line px-2 py-1 text-[10px] text-muted sm:px-3 sm:text-[11px]">
-              {remaining}/{limit}
+              {remaining}/{limit} pts
             </span>
             <span className="rounded-full border border-bright/30 bg-bright/10 px-2 py-1 text-[10px] font-semibold text-accent sm:px-3 sm:text-[11px]">
               Live
@@ -850,7 +850,7 @@ export function EnginePage() {
         }}
       />
 
-      <Modal open={creditsOpen} title="Engine questions" onClose={() => setCreditsOpen(false)}>
+      <Modal open={creditsOpen} title="Engine points" onClose={() => setCreditsOpen(false)}>
         <BasicCheckout />
       </Modal>
     </div>

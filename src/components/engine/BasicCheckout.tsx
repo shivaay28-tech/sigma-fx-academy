@@ -55,7 +55,7 @@ export function BasicCheckout() {
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-ink/80">
-        Five engine questions are included. A {APP_SHORT_NAME} deposit adds 15% of the amount as questions. A ₹100 deposit adds 15 questions.
+        Five engine questions are included, and one question uses 10 points. A {APP_SHORT_NAME} deposit adds 15% of the rupee amount as points. A ₹100 deposit adds 15 points.
       </p>
       <div className="rounded-2xl bg-white p-3 ring-1 ring-line">
         <Input

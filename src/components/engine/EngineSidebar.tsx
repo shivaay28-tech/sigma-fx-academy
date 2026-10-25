@@ -143,7 +143,7 @@ export function EngineSidebar({
               <span className="min-w-0">
                 <span className="block truncate text-sm font-semibold">{user.fullName}</span>
                 <span className="block text-[11px] text-mist/50">
-                  {remaining} of {limit}
+                  {remaining} of {limit} points
                 </span>
               </span>
             )}
@@ -154,7 +154,7 @@ export function EngineSidebar({
             {collapsed ? null : (
               <span>
                 <span className="block text-sm font-semibold">Sign in</span>
-                <span className="block text-[11px] text-mist/50">{remaining} of {limit}</span>
+                <span className="block text-[11px] text-mist/50">{remaining} of {limit} points</span>
               </span>
             )}
           </Link>

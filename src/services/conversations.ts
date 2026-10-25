@@ -3,7 +3,7 @@ import { isSupabaseEnabled } from '@/services/backend'
 import { getSupabase } from '@/services/supabase'
 import { readJson, writeJson } from '@/services/storage'
 import type { AiConversation, AiMessage } from '@/types'
-import { FREE_QUESTIONS, STORAGE_KEYS } from '@/utils/constants'
+import { FREE_QUESTIONS, POINTS_PER_QUESTION, STORAGE_KEYS } from '@/utils/constants'
 import { uid } from '@/utils/format'
 
 interface CreditState {
@@ -83,7 +83,7 @@ export const conversationService = {
   },
 
   creditLimit(bonusQuestions = 0) {
-    return FREE_QUESTIONS + Math.max(0, bonusQuestions)
+    return FREE_QUESTIONS * POINTS_PER_QUESTION + Math.max(0, bonusQuestions)
   },
 
   used(userId?: string) {
@@ -100,16 +100,18 @@ export const conversationService = {
   },
 
   async consume(userId?: string) {
+    const cost = POINTS_PER_QUESTION
     if (isSupabaseEnabled() && userId) {
-      const { data, error } = await getSupabase().rpc('consume_question')
-      if (!error && typeof data === 'number') authService.setQuestionsUsed(data)
+      const next = (authService.current()?.questionsUsed ?? 0) + cost
+      const { error } = await getSupabase().from('profiles').update({ questions_used: next }).eq('id', userId)
+      if (!error) authService.setQuestionsUsed(next)
       return
     }
     const credits = loadCredits()
     if (userId) {
-      credits.byUser[userId] = (credits.byUser[userId] ?? 0) + 1
+      credits.byUser[userId] = (credits.byUser[userId] ?? 0) + cost
     } else {
-      credits.guestUsed += 1
+      credits.guestUsed += cost
     }
     writeJson(STORAGE_KEYS.questionCredits, credits)
   },
