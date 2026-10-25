@@ -52,7 +52,7 @@ export async function recordDeposit(admin: SupabaseClient, baazexId: string, amo
   const ticket = reference.trim()
   const questions = questionsFor(amountUsd)
   if (!id) throw new Error(`Enter the ${BRAND.shortName} ID.`)
-  if (!Number.isFinite(amountUsd) || amountUsd <= 0) throw new Error('Enter the deposit amount in dollars.')
+  if (!Number.isFinite(amountUsd) || amountUsd <= 0) throw new Error('Enter the deposit amount in rupees.')
   if (!ticket) throw new Error('Enter a deposit reference so it is only counted once.')
   if (questions < 1) throw new Error('That deposit is too small to add credit.')
 
