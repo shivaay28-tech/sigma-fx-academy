@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-navy/95 text-mist shadow-[0_12px_40px_-24px_rgb(6_21_43_/_0.65)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-1.5 px-3 sm:h-16 lg:px-4 xl:gap-2 xl:px-6">
-        <Link to="/" aria-label={`${APP_NAME} home`} className="shrink-0 [&_img]:h-9 xl:[&_img]:h-12">
+        <Link to="/" aria-label={`${APP_NAME} home`} className="shrink-0 [&_img]:h-12 xl:[&_img]:h-14">
           <Logo light />
         </Link>
         <nav className="hidden shrink-0 items-center gap-0.5 lg:flex xl:gap-1" aria-label="Primary">

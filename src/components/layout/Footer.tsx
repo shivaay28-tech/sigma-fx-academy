@@ -68,7 +68,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 sm:pt-14">
         <div className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div className="max-w-md">
-            <Logo light className="h-10 sm:h-11" />
+            <Logo light className="h-14 sm:h-16" />
             <p className="mt-3 text-sm leading-relaxed text-mist/85">
               Structured courses on commodities and Indian markets, with quizzes, certificates and an AI study assistant.
             </p>

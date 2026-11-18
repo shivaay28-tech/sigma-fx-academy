@@ -37,7 +37,7 @@ export const BRAND = {
     navy600: '#1b4785',
     baazex: '#1565e0',
     baazex600: '#0f4fb8',
-    bright: '#4aa3ff',
+    bright: '#1fd8f2',
     accent: '#0d55c7',
     ink: '#0f1c33',
     muted: '#56667f',

@@ -18,12 +18,12 @@ export function Logo({
 }) {
   if (usesImageLogo(BRAND.id)) {
     if (compact) {
-      return <img src="/brand/logo-mark.png" alt="" className={cn('h-9 w-9 object-contain', className)} />
+      return <img src="/brand/logo-mark.webp" alt="" className={cn('h-9 w-9 object-contain', className)} />
     }
 
     return (
       <img
-        src={light ? '/brand/logo-light.png' : '/brand/logo-ink.png'}
+        src={light ? '/brand/logo-light.webp' : '/brand/logo-ink.webp'}
         alt={BRAND.name}
         className={cn('h-10 w-auto sm:h-12', className)}
       />
