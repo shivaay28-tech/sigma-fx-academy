@@ -1,5 +1,6 @@
 import type { Quiz } from '@/types'
 import { APP_NAME, PASSING_SCORE } from '@/utils/constants'
+import { extraQuizzes } from '@/data/quizzesExtra'
 
 function q(
   id: string,
@@ -21,7 +22,7 @@ function q(
   }
 }
 
-export const seedQuizzes: Quiz[] = [
+const baseQuizzes: Quiz[] = [
   {
     id: 'quiz-forex-intro',
     courseId: 'course-forex-intro',
@@ -646,3 +647,5 @@ export const seedQuizzes: Quiz[] = [
     ],
   },
 ]
+
+export const seedQuizzes: Quiz[] = [...baseQuizzes, ...extraQuizzes]

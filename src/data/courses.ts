@@ -1,5 +1,6 @@
 import type { Course, Lesson, Module } from '@/types'
 import { APP_NAME } from '@/utils/constants'
+import { extraCourses } from '@/data/coursesExtra'
 
 function lesson(
   id: string,
@@ -18,7 +19,7 @@ function module(id: string, title: string, order: number, lessons: Lesson[]): Mo
   return { id, title, order, lessons }
 }
 
-export const seedCourses: Course[] = [
+const baseCourses: Course[] = [
   {
     id: 'course-forex-intro',
     slug: 'introduction-to-mcx',
@@ -900,3 +901,5 @@ export const seedCourses: Course[] = [
     ],
   },
 ]
+
+export const seedCourses: Course[] = [...baseCourses, ...extraCourses]

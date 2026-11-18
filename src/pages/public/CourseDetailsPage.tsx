@@ -76,7 +76,7 @@ export function CourseDetailsPage() {
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-muted">
             <DifficultyBadge level={course.difficulty} />
             <span className="inline-flex items-center gap-1">
-              <Clock className="h-4 w-4" /> {Math.round(getCourseDuration(course) / 60)}h {getCourseDuration(course) % 60}m
+              <Clock className="h-4 w-4" /> {formatMinutes(getCourseDuration(course))}
             </span>
             <span className="inline-flex items-center gap-1">
               <PlayCircle className="h-4 w-4" /> {getLessonCount(course)} lessons
@@ -169,4 +169,11 @@ export function CourseDetailsPage() {
       </div>
     </div>
   )
+}
+
+function formatMinutes(total: number) {
+  const hours = Math.floor(total / 60)
+  const minutes = total % 60
+  if (!hours) return `${minutes} min`
+  return minutes ? `${hours}h ${minutes}m` : `${hours}h`
 }

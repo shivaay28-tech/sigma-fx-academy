@@ -1,8 +1,11 @@
 import { APP_SHORT_NAME, COMPANY_HOST, COMPANY_URL, DISCLAIMER, FREE_QUESTIONS, POINTS_PER_QUESTION } from '@/utils/constants'
 import { MonitorSmartphone, Shield } from 'lucide-react'
+import { useAcademy } from '@/context/AcademyContext'
 import { Link } from 'react-router-dom'
 
 export function EngineRail() {
+  const { courses } = useAcademy()
+  const published = courses.filter((course) => course.status === 'published').length
   return (
     <aside className="hidden h-full w-[260px] shrink-0 flex-col overflow-y-auto border-l border-baazex/15 bg-white p-4 lg:flex">
       <p className="text-[10px] font-bold tracking-[0.2em] text-muted uppercase">Academy</p>
@@ -18,7 +21,7 @@ export function EngineRail() {
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
           <div>
-            <p className="text-sm font-bold text-accent">11</p>
+            <p className="text-sm font-bold text-accent">{published}</p>
             <p className="text-[10px] text-muted">Courses</p>
           </div>
           <div>

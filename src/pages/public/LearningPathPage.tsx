@@ -13,22 +13,22 @@ const curriculum = [
   {
     title: 'Foundations',
     text: 'How MCX is organised, how gold, silver and crude are quoted, and how orders and expiry work.',
-    slugs: ['introduction-to-mcx', 'mcx-gold-silver-crude-and-copper', 'mcx-orders-and-expiry', 'nsc-and-mcx'],
+    slugs: ['introduction-to-mcx', 'mcx-gold-silver-crude-and-copper', 'mcx-mini-and-micro-contracts', 'mcx-orders-and-expiry', 'nsc-and-mcx', 'indian-markets-nse-cash-and-indices'],
   },
   {
     title: 'Contract maths and the screen',
     text: 'Lot size, margin, mark-to-market, and reading the MCX trading screen.',
-    slugs: ['mcx-lots-margin-and-mark-to-market', 'the-mcx-trading-screen'],
+    slugs: ['mcx-lots-margin-and-mark-to-market', 'the-mcx-trading-screen', 'order-types-and-validity', 'position-sizing', 'options-on-mcx-futures'],
   },
   {
     title: 'Analysis',
     text: 'Reading charts and the news that moves prices, as context rather than a forecast.',
-    slugs: ['charts-for-mcx-commodities', 'what-moves-mcx-prices'],
+    slugs: ['charts-for-mcx-commodities', 'candlestick-patterns-for-commodities', 'support-resistance-and-trend', 'indicators-in-context', 'what-moves-mcx-prices', 'crude-oil-drivers', 'gold-and-silver-drivers', 'bullion-prices-in-india'],
   },
   {
     title: 'Risk and conduct',
     text: 'Protecting capital, managing emotions, and how professionals explain risk.',
-    slugs: ['risk-management-fundamentals', 'trading-psychology', 'commodity-participants'],
+    slugs: ['risk-management-fundamentals', 'gaps-price-limits-and-event-risk', 'trading-psychology', 'trading-journal-and-routine', 'commodity-participants', 'hedging-basics-for-businesses'],
   },
 ]
 

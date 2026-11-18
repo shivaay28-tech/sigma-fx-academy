@@ -275,6 +275,32 @@ begin
         and q.title ~* '(forex|metatrader|currency pair|pips|introducing broker fundamentals|financial markets)';
   end loop;
 
+  -- Add any seed course or quiz that is not in the database yet (for example the November 2026
+  -- batch). Existing rows, including admin edits, are never overwritten here.
+  for course in select value from jsonb_array_elements(coalesce(payload->'courses', '[]'::jsonb))
+  loop
+    insert into public.courses (
+      id, slug, title, subtitle, description, category_id, difficulty,
+      duration_hours, objectives, instructor, status, popular, featured, quiz_id, modules
+    )
+    values (
+      course->>'id', course->>'slug', course->>'title', coalesce(course->>'subtitle', ''),
+      coalesce(course->>'description', ''), course->>'categoryId', course->>'difficulty',
+      coalesce((course->>'durationHours')::numeric, 1), coalesce(course->'objectives', '[]'::jsonb),
+      coalesce(course->>'instructor', ''), coalesce(course->>'status', 'published'),
+      coalesce((course->>'popular')::boolean, false), coalesce((course->>'featured')::boolean, false),
+      coalesce(course->>'quizId', ''), coalesce(course->'modules', '[]'::jsonb)
+    )
+    on conflict do nothing;
+  end loop;
+
+  for quiz in select value from jsonb_array_elements(coalesce(payload->'quizzes', '[]'::jsonb))
+  loop
+    insert into public.quizzes (id, course_id, title, passing_score, questions)
+    values (quiz->>'id', quiz->>'courseId', quiz->>'title', coalesce((quiz->>'passingScore')::int, 70), coalesce(quiz->'questions', '[]'::jsonb))
+    on conflict do nothing;
+  end loop;
+
   if exists (select 1 from public.courses limit 1) then
     return;
   end if;
