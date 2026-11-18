@@ -169,7 +169,7 @@ export function HomePage() {
           </Reveal>
           <Reveal delay={120}>
             <div className="rounded-[28px] border border-white/10 bg-white/[0.06] p-5 sm:p-6">
-              <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-baazex px-4 py-3 text-sm text-white">How is gold looking today?</div>
+              <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-baazex px-4 py-3 text-sm text-on-button">How is gold looking today?</div>
               <div className="mt-3 max-w-[92%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm leading-relaxed text-ink">
                 <p className="font-semibold">GOLD — MCX Gold</p>
                 <p className="mt-1 text-muted">The engine shows the last TradingView price, today's change and range, then walks through the trend, the level that would prove the idea wrong, and the risk to size for.</p>
@@ -230,7 +230,7 @@ export function HomePage() {
                   <ul className="mt-5 space-y-2.5">
                     {level.items.map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm font-medium text-ink">
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-baazex" />
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
                         {item}
                       </li>
                     ))}
@@ -259,8 +259,8 @@ export function HomePage() {
                 <span
                   className={
                     index === 0
-                      ? 'grid h-14 w-14 place-items-center rounded-2xl bg-baazex text-white'
-                      : 'grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-baazex/10 text-baazex'
+                      ? 'grid h-14 w-14 place-items-center rounded-2xl bg-baazex text-on-button'
+                      : 'grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-baazex/15 text-accent'
                   }
                 >
                   <item.icon className={index === 0 ? 'h-6 w-6' : 'h-5 w-5'} />
@@ -286,7 +286,7 @@ export function HomePage() {
             {steps.map((item, index) => (
               <li key={item.title} className="relative pl-16 md:pl-0 md:text-center">
                 <Reveal delay={index * 100}>
-                  <span className="absolute top-0 left-0 grid h-12 w-12 place-items-center rounded-full border-4 border-navy bg-baazex text-white shadow-float md:relative md:mx-auto">
+                  <span className="absolute top-0 left-0 grid h-12 w-12 place-items-center rounded-full border-4 border-navy bg-baazex text-on-button shadow-float md:relative md:mx-auto">
                     <item.icon className="h-5 w-5" />
                   </span>
                   <p className="text-xs font-bold tracking-[0.16em] text-bright uppercase md:mt-4">Step {index + 1}</p>
@@ -312,7 +312,7 @@ export function HomePage() {
             <ul className="mt-6 grid grid-cols-2 gap-3">
               {features.map((feature) => (
                 <li key={feature.label} className="flex items-center gap-2.5 rounded-xl border border-line bg-white px-3 py-3 text-sm font-medium text-ink">
-                  <feature.icon className="h-4 w-4 shrink-0 text-baazex" />
+                  <feature.icon className="h-4 w-4 shrink-0 text-accent" />
                   {feature.label}
                 </li>
               ))}

@@ -35,7 +35,7 @@ export function Header() {
               className={({ isActive }) =>
                 cn(
                   'whitespace-nowrap rounded-lg px-1 py-1.5 text-[13px] font-semibold transition xl:px-2 xl:py-2 xl:text-sm xl:tracking-wide',
-                  isActive ? 'bg-baazex text-white shadow-float' : 'text-mist/75 hover:text-white',
+                  isActive ? 'bg-baazex text-on-button shadow-float' : 'text-mist/75 hover:text-white',
                 )
               }
             >
@@ -102,7 +102,7 @@ export function Header() {
                 <Link
                   to="/engine"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-white"
+                  className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-on-button"
                 >
                   Open AI Engine
                 </Link>
@@ -114,7 +114,7 @@ export function Header() {
                   <Link
                     to="/register"
                     onClick={() => setOpen(false)}
-                    className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-white"
+                    className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-on-button"
                   >
                     Create Free Account
                   </Link>

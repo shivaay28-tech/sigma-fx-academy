@@ -104,7 +104,7 @@ export function Sidebar({
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold',
-                isActive ? 'bg-baazex text-white' : 'text-mist/70 hover:bg-white/8 hover:text-white',
+                isActive ? 'bg-baazex text-on-button' : 'text-mist/70 hover:bg-white/8 hover:text-white',
                 collapsed && 'justify-center px-0',
               )
             }
@@ -150,7 +150,7 @@ export function Sidebar({
 
       <div className="border-t border-white/10 p-3">
         <div className={cn('flex items-center gap-3 rounded-xl bg-white/5 p-2', collapsed && 'justify-center')}>
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-baazex text-xs font-bold text-white">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-baazex text-xs font-bold text-on-button">
             {initials(user?.fullName ?? 'BA')}
           </span>
           {collapsed ? null : (

@@ -64,7 +64,7 @@ export function Footer() {
 
   return (
     <footer className="relative z-[2] bg-navy text-mist">
-      <div className="h-1 bg-gradient-to-r from-baazex via-bright to-baazex" />
+      <div className="h-1 bg-gradient-to-r from-bright via-baazex to-sky" />
       <div className="mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 sm:pt-14">
         <div className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div className="max-w-md">

@@ -1,4 +1,5 @@
 import { Seo } from '@/components/Seo'
+import { BRAND } from '@/assets/brand'
 import { BasicCheckout } from '@/components/engine/BasicCheckout'
 import { EngineComposer } from '@/components/engine/EngineComposer'
 import { EngineMarkdown } from '@/components/engine/EngineMarkdown'
@@ -372,8 +373,8 @@ export function EnginePage() {
     doc.title = 'Start analysis'
     doc.body.replaceChildren()
     doc.body.style.margin = '0'
-    doc.body.style.background = '#f7f4ee'
-    doc.body.style.color = '#1c1408'
+    doc.body.style.background = BRAND.colors.navy
+    doc.body.style.color = '#f6f1ea'
     doc.body.style.fontFamily = 'Inter, system-ui, sans-serif'
     const wrap = doc.createElement('div')
     wrap.style.padding = '12px'
@@ -387,7 +388,7 @@ export function EnginePage() {
     video.style.height = '160px'
     video.style.objectFit = 'contain'
     video.style.borderRadius = '12px'
-    video.style.background = '#1c1408'
+    video.style.background = BRAND.colors.navy800
     const note = doc.createElement('p')
     note.textContent = 'Switch to the one screen you want, then start the analysis. Only that shared screen is read.'
     note.style.margin = '10px 0'
@@ -403,8 +404,8 @@ export function EnginePage() {
     start.style.height = '40px'
     start.style.border = '0'
     start.style.borderRadius = '12px'
-    start.style.background = '#c4a35a'
-    start.style.color = '#1c1408'
+    start.style.background = BRAND.colors.baazex
+    start.style.color = BRAND.colors.onButton
     start.style.fontWeight = '700'
     start.onclick = () => {
       void startScreenAnalysis()
@@ -415,8 +416,9 @@ export function EnginePage() {
     cancel.style.height = '40px'
     cancel.style.padding = '0 14px'
     cancel.style.borderRadius = '12px'
-    cancel.style.border = '1px solid #e6d7b8'
-    cancel.style.background = '#fff'
+    cancel.style.border = '1px solid rgba(255,255,255,0.25)'
+    cancel.style.background = 'transparent'
+    cancel.style.color = '#f6f1ea'
     cancel.style.fontWeight = '700'
     cancel.onclick = () => stopScreenShare()
     row.append(start, cancel)
@@ -695,7 +697,7 @@ export function EnginePage() {
               {active?.messages.map((message, index) => (
                 <article key={message.id} className={message.role === 'user' ? 'ml-8 flex flex-col items-end sm:ml-16' : 'mr-1 sm:mr-6'}>
                   <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] text-muted uppercase">
-                    {message.role === 'user' ? null : <Sparkles className="h-3.5 w-3.5 text-baazex" />}
+                    {message.role === 'user' ? null : <Sparkles className="h-3.5 w-3.5 text-accent" />}
                     {message.role === 'user' ? 'You' : ENGINE_NAME}
                   </p>
                   {message.attachments.map((attachment) =>
@@ -744,7 +746,7 @@ export function EnginePage() {
               {sending ? (
                 <article className="mr-1 sm:mr-6">
                   <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] text-muted uppercase">
-                    <Sparkles className="h-3.5 w-3.5 text-baazex" />
+                    <Sparkles className="h-3.5 w-3.5 text-accent" />
                     {ENGINE_NAME}
                   </p>
                   <div className="rounded-2xl rounded-tl-md border border-line bg-white p-4 shadow-card sm:p-5">

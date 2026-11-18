@@ -147,7 +147,7 @@ export function LearningPathPage() {
 
           <li className="relative pl-16 sm:pl-24">
             <Reveal>
-              <span className="absolute top-0 left-0 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-baazex to-bright text-white shadow-float sm:h-15 sm:w-15">
+              <span className="absolute top-0 left-0 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-baazex to-bright text-on-button shadow-float sm:h-15 sm:w-15">
                 <Users className="h-5 w-5 sm:h-6 sm:w-6" />
               </span>
               <div className="rounded-3xl bg-navy p-6 text-mist sm:p-8">
