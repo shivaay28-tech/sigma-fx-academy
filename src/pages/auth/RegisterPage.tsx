@@ -7,7 +7,7 @@ import { useToast } from '@/context/ToastContext'
 import { countries } from '@/data/countries'
 import { isEmail, isPhone, isStrongPassword, required, type FieldErrors } from '@/utils/validation'
 import { useMemo, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { APP_NAME } from '@/utils/constants'
 import { isSupabaseEnabled } from '@/services/backend'
 
@@ -17,6 +17,8 @@ export function RegisterPage() {
   const { register } = useAuth()
   const { push } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as { from?: string } | null)?.from
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [countryCode, setCountryCode] = useState('AE')
@@ -65,11 +67,11 @@ export function RegisterPage() {
     }
     if (!result.user) {
       push('success', 'Check your email', result.message)
-      navigate('/login')
+      navigate('/login', { state: from ? { from } : undefined })
       return
     }
-    push('success', 'Account created', 'You can start exploring the AI Engine and courses.')
-    navigate('/engine')
+    push('success', 'Account created', from ? 'You can enrol now.' : 'You can start exploring the AI Engine and courses.')
+    navigate(from ?? '/engine')
   }
 
   return (
@@ -126,8 +128,8 @@ export function RegisterPage() {
       </form>
       <p className="mt-4 text-sm text-muted">
         Already registered?{' '}
-        <Link to="/login" className="font-semibold text-accent">
-          Sign in
+        <Link to="/login" state={from ? { from } : undefined} className="font-semibold text-accent">
+          Log in
         </Link>
       </p>
     </div>

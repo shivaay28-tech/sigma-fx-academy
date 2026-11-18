@@ -8,15 +8,15 @@ import { Modal } from '@/components/ui/Modal'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { instruments } from '@/data/instruments'
-import { symbolsInText, tradingViewTicker } from '@/data/tradingView'
-import { aiService, formatChartLevels } from '@/services/ai'
+import { formatQuoteTime, resolveFocus, symbolsInText, tickerCandidates, tradingViewTicker } from '@/data/tradingView'
+import { aiService, formatChartLevels, isFollowUp } from '@/services/ai'
 import { conversationService, newMessage } from '@/services/conversations'
 import { formatLiveQuote, tradingViewService, type LiveQuote } from '@/services/tradingView'
 import type { AiAttachment, AiConversation } from '@/types'
 import { media } from '@/data/media'
 import { APP_NAME, DISCLAIMER, ENGINE_NAME, POINTS_PER_QUESTION } from '@/utils/constants'
 import { analysisTitle, uid } from '@/utils/format'
-import { Camera, Clapperboard, Copy, Menu, MonitorUp, NotebookPen, RefreshCw } from 'lucide-react'
+import { Camera, Clapperboard, Copy, Menu, MonitorUp, NotebookPen, RefreshCw, Sparkles } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react'
 
 export function EnginePage() {
@@ -155,8 +155,18 @@ export function EnginePage() {
       const namedInText = symbolsInText(userMessage.content)
       const chartImage = userMessage.attachments.find((item) => item.kind === 'image')
       const hasChartImage = Boolean(chartImage)
-      const mentioned = hasChartImage ? namedInText : symbolsInText(userMessage.content, symbol ?? instrument)
-      const have = new Set(quotesRef.current.map((item) => item.symbol))
+      const history = (existing?.messages ?? []).map((item) => ({ role: item.role, content: item.content }))
+      const priorUser = [...history].reverse().find((item) => item.role === 'user' && item.content !== userMessage.content)?.content
+      const focus = resolveFocus({
+        prompt: userMessage.content,
+        selected: symbol ?? instrument,
+        prior: priorUser,
+        followUp: isFollowUp(userMessage.content, history),
+      })
+      // Typed tickers outside the preset list (e.g. TATAMOTORS) count only if TradingView returns a quote.
+      const candidates = !hasChartImage && focus.source !== 'question' ? tickerCandidates(userMessage.content) : []
+      const mentioned = hasChartImage ? namedInText : [...focus.symbols, ...candidates]
+      const have = new Set(quotesRef.current.filter((item) => Date.now() - (item.fetchedAt ?? 0) < 60_000).map((item) => item.symbol))
       const missing = mentioned.filter((item) => !have.has(item))
       if (missing.length) {
         try {
@@ -177,6 +187,15 @@ export function EnginePage() {
         } catch {
           // A failed lookup must not invent a price.
         }
+      }
+      const found = candidates.filter((item) => quotesRef.current.some((quote) => quote.symbol === item && quote.close > 0))
+      // A typed ticker that TradingView cannot find must not fall back to the bottom-bar instrument.
+      const focusSymbols = found.length ? found : candidates.length && focus.source === 'selected' ? [] : focus.symbols
+      // The bottom-bar selection follows the question.
+      if (!hasChartImage && focus.source === 'question' && focusSymbols[0]) {
+        setInstrument(focusSymbols[0])
+        const saved = conversationService.get(conversationId)
+        if (saved) conversationService.save({ ...saved, instrument: focusSymbols[0] })
       }
 
       let output = ''
@@ -231,9 +250,10 @@ export function EnginePage() {
         {
           prompt: userMessage.content,
           instrument: symbol ?? instrument,
+          focusSymbols,
           attachments: userMessage.attachments,
           answerLength: 'standard',
-          history: (existing?.messages ?? []).map((item) => ({ role: item.role, content: item.content })),
+          history,
           liveQuotes: quotesRef.current,
         },
         (token) => {
@@ -520,7 +540,7 @@ export function EnginePage() {
     )
     const titled =
       conversation.messages.length === 0
-        ? analysisTitle(text || 'Chart study', instrument)
+        ? analysisTitle(text || 'Chart study', symbolsInText(text)[0] ?? instrument)
         : conversation.title
     conversation = conversationService.appendMessage(conversation.id, userMessage, titled)
     conversationService.save({ ...conversation, instrument })
@@ -619,9 +639,15 @@ export function EnginePage() {
             <span className="truncate font-semibold text-ink">{active?.title ?? 'New analysis'}</span>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <span className="rounded-full border border-line px-2 py-1 text-[10px] text-muted sm:px-3 sm:text-[11px]">
-              {remaining}/{limit} pts
-            </span>
+            <button
+              type="button"
+              onClick={() => setCreditsOpen(true)}
+              title={`${remaining} of ${limit} points left. Each question uses ${POINTS_PER_QUESTION} points.`}
+              className="rounded-full border border-line bg-white px-2 py-1 text-[10px] font-semibold text-ink hover:border-baazex/40 sm:px-3 sm:text-[11px]"
+            >
+              {Math.floor(remaining / POINTS_PER_QUESTION)} questions left
+              <span className="ml-1 hidden font-normal text-muted sm:inline">· {remaining}/{limit} pts</span>
+            </button>
             <span className="rounded-full border border-bright/30 bg-bright/10 px-2 py-1 text-[10px] font-semibold text-accent sm:px-3 sm:text-[11px]">
               Live
             </span>
@@ -649,26 +675,27 @@ export function EnginePage() {
                 What are we <span className="text-accent">studying</span> today?
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted sm:mt-4">
-                Pick a symbol. The engine uses the live TradingView price for the entry, stop, and target.
+                Ask about gold, crude oil, Nifty, Bank Nifty or any NSE share. The engine reads the live TradingView price and explains the trend, key levels and risk in plain language.
               </p>
               <div className="mt-6 grid w-full grid-cols-2 gap-2.5 sm:mt-8 sm:gap-3">
-                <ActionCard icon={MonitorUp} title="Share my screen" text="Live read of your MCX or TradingView chart" onClick={shareScreen} />
+                <ActionCard icon={MonitorUp} title="Share my screen" text="Show your MCX or TradingView chart for pattern analysis" onClick={shareScreen} />
                 <ActionCard icon={Camera} title="Upload a chart" text="Screenshot from any platform" onClick={() => fileRef.current?.click()} />
-                <ActionCard icon={Clapperboard} title="Send a video" text="I sample frames across the clip" onClick={() => videoRef.current?.click()} />
+                <ActionCard icon={Clapperboard} title="Send a video" text="Upload a short clip of your chart for pattern analysis" onClick={() => videoRef.current?.click()} />
                 <ActionCard
                   icon={NotebookPen}
                   title="Today's brief"
-                  text="Sessions, calendar risk and study focus"
-                  onClick={() => void sendPrompt('Give me a directional call on NIFTY, BANKNIFTY, and GOLD for H1 using the live TradingView prices in this message.')}
+                  text="Live snapshot of key markets, sessions and study focus"
+                  onClick={() => void sendPrompt("Today's brief for NIFTY, BANKNIFTY and GOLD")}
                 />
               </div>
               <p className="mt-6 hidden max-w-2xl text-[11px] leading-relaxed text-muted sm:block">{DISCLAIMER}</p>
             </div>
           ) : (
-            <div className="relative mx-auto max-w-3xl space-y-6 px-4 py-8">
+            <div className="relative mx-auto max-w-3xl space-y-7 px-3 py-6 sm:px-4 sm:py-8">
               {active?.messages.map((message, index) => (
-                <article key={message.id} className={message.role === 'user' ? 'ml-4 sm:ml-10' : 'mr-2 sm:mr-6'}>
-                  <p className="mb-2 text-[11px] font-bold tracking-[0.16em] text-muted uppercase">
+                <article key={message.id} className={message.role === 'user' ? 'ml-8 flex flex-col items-end sm:ml-16' : 'mr-1 sm:mr-6'}>
+                  <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] text-muted uppercase">
+                    {message.role === 'user' ? null : <Sparkles className="h-3.5 w-3.5 text-baazex" />}
                     {message.role === 'user' ? 'You' : ENGINE_NAME}
                   </p>
                   {message.attachments.map((attachment) =>
@@ -680,13 +707,15 @@ export function EnginePage() {
                       </p>
                     ),
                   )}
-                  <div className="rounded-2xl border border-line bg-baazex/5 p-4">
-                    {message.role === 'assistant' ? (
+                  {message.role === 'assistant' ? (
+                    <div className="rounded-2xl rounded-tl-md border border-line bg-white p-4 shadow-card sm:p-5">
                       <EngineMarkdown text={message.content} />
-                    ) : (
-                      <p className="whitespace-pre-wrap text-sm leading-7 text-ink">{message.content}</p>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="max-w-full rounded-2xl rounded-tr-md bg-baazex px-4 py-3 text-on-button shadow-float">
+                      <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
+                    </div>
+                  )}
                   {message.role === 'assistant' && !sending ? (
                     <div className="mt-2 flex gap-2">
                       <button
@@ -713,9 +742,13 @@ export function EnginePage() {
                 </article>
               ))}
               {sending ? (
-                <article className="mr-2 sm:mr-6">
-                  <p className="mb-2 text-[11px] font-bold tracking-[0.16em] text-muted uppercase">{ENGINE_NAME}</p>
-                  <div className="rounded-2xl border border-bright/20 bg-baazex/5 p-4">
+                <article className="mr-1 sm:mr-6">
+                  <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] text-muted uppercase">
+                    <Sparkles className="h-3.5 w-3.5 text-baazex" />
+                    {ENGINE_NAME}
+                  </p>
+                  <div className="rounded-2xl rounded-tl-md border border-line bg-white p-4 shadow-card sm:p-5">
+                    {!stream && !thinking ? <p className="text-sm text-muted">Reading the live price…</p> : null}
                     {thinking && !stream ? (
                       <p className="mb-3 text-xs leading-5 text-muted italic">Thinking… {thinking.slice(-160)}</p>
                     ) : null}
@@ -750,9 +783,7 @@ export function EnginePage() {
                 type="button"
                 onClick={() => {
                   setInstrument(item.symbol)
-                  void sendPrompt(
-                    `Give a directional call on ${item.symbol} (${item.name}) for H1 using the live TradingView price in this message.`,
-                  )
+                  void sendPrompt(`Explain today's ${item.name} (${item.symbol}) chart: trend, key levels and risk.`)
                 }}
                 className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${instrument === item.symbol ? 'border-bright bg-bright/15 text-accent' : 'border-line text-muted hover:text-accent'}`}
               >
@@ -878,6 +909,9 @@ function LiveMarket({
               {active.change >= 0 ? '+' : ''}
               {active.change.toFixed(2)}%
             </span>
+            {active.fetchedAt ? (
+              <span className="ml-2 text-[10px] font-medium text-muted">updated {formatQuoteTime(active.fetchedAt)}</span>
+            ) : null}
           </p>
         ) : (
           <p className="text-[11px] text-muted">Waiting for the live quote</p>
@@ -917,7 +951,7 @@ function ActionCard({
   onClick: () => void
 }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-2xl border border-line bg-baazex/5 p-3 text-left hover:border-bright/30 hover:bg-baazex/8 sm:p-4">
+    <button type="button" onClick={onClick} className="rounded-2xl border border-line bg-white p-3 text-left shadow-card transition hover:-translate-y-0.5 hover:border-baazex/40 sm:p-4">
       <span className="grid h-8 w-8 place-items-center rounded-xl bg-bright/15 text-accent sm:h-10 sm:w-10">
         <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </span>

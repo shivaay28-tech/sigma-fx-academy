@@ -46,7 +46,7 @@ export function CourseDetailsPage() {
 
   async function onEnroll() {
     if (!user) {
-      navigate('/login', { state: { from: `/courses/${currentCourse.slug}` } })
+      navigate('/register', { state: { from: `/courses/${currentCourse.slug}` } })
       return
     }
     setLoading(true)
@@ -115,12 +115,14 @@ export function CourseDetailsPage() {
           </div>
         </div>
 
-        <aside className="lg:col-span-4">
-          <div className="sticky top-24 rounded-3xl panel p-6 shadow-card">
-            <p className="text-sm font-semibold text-muted">Educational enrolment</p>
-            <p className="mt-1 text-2xl font-extrabold text-ink">Free enrolment</p>
+        <aside className="lg:col-span-4 lg:self-start lg:sticky lg:top-24">
+          <div className="rounded-3xl panel p-6 shadow-card">
+            <p className="text-sm font-semibold text-muted">{enrolled ? 'You are enrolled' : 'This course is free'}</p>
+            <p className="mt-1 text-2xl font-extrabold text-ink">{enrolled ? 'Keep going' : 'Free enrolment'}</p>
             <p className="mt-2 text-sm text-muted">
-              Enrolment stores lesson progress, notes, and quiz results with your Academy account.
+              {user
+                ? 'Your lesson progress, notes and quiz results are saved to your account.'
+                : 'Create a free account to enrol. Your progress, notes and quiz results are saved as you learn, and you earn a certificate when you finish.'}
             </p>
             <div className="mt-5 space-y-2">
               {enrolled && firstLesson ? (
@@ -129,7 +131,7 @@ export function CourseDetailsPage() {
                 </Button>
               ) : (
                 <Button className="w-full" loading={loading} onClick={onEnroll}>
-                  {user ? 'Enrol in this course' : 'Login to enrol'}
+                  {user ? 'Enrol in this course' : 'Create Free Account to Enrol'}
                 </Button>
               )}
               <Button
@@ -138,7 +140,7 @@ export function CourseDetailsPage() {
                 icon={<Bookmark className="h-4 w-4" />}
                 onClick={() => {
                   if (!user) {
-                    navigate('/login')
+                    navigate('/login', { state: { from: `/courses/${course.slug}` } })
                     return
                   }
                   const currentlySaved = isSaved(course.id)
@@ -153,6 +155,14 @@ export function CourseDetailsPage() {
               <Link to={`/quiz/${course.slug}/${course.quizId}`} className="mt-4 block text-center text-sm font-semibold text-accent">
                 Open course quiz
               </Link>
+            ) : null}
+            {!user ? (
+              <p className="mt-4 text-center text-sm text-muted">
+                Already have an account?{' '}
+                <Link to="/login" state={{ from: `/courses/${course.slug}` }} className="font-semibold text-accent">
+                  Log in
+                </Link>
+              </p>
             ) : null}
           </div>
         </aside>

@@ -1,281 +1,363 @@
-import { CategoryCard } from '@/components/course/CategoryCard'
 import { CourseCard } from '@/components/course/CourseCard'
 import { Seo } from '@/components/Seo'
 import { Button } from '@/components/ui/Button'
 import { Disclaimer } from '@/components/ui/Disclaimer'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { Reveal } from '@/components/ui/Reveal'
 import { useAcademy } from '@/context/AcademyContext'
-import { categories } from '@/data/categories'
+import { useAuth } from '@/context/AuthContext'
 import { faqs } from '@/data/faqs'
-import { APP_NAME, APP_SHORT_NAME, DISCLAIMER } from '@/utils/constants'
-import { getLessonCount } from '@/utils/course'
+import { APP_NAME, APP_SHORT_NAME, DISCLAIMER, FREE_QUESTIONS, PASSING_SCORE, POINTS_PER_QUESTION } from '@/utils/constants'
+import type { Course } from '@/types'
 import {
   ArrowRight,
+  Award,
   BookOpen,
   CheckCircle2,
+  ChevronDown,
+  Download,
   GraduationCap,
   LineChart,
+  ListChecks,
+  NotebookPen,
+  Search,
   Shield,
   Sparkles,
-  Waypoints,
+  UserPlus,
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const levels = [
   {
+    level: 1,
     title: 'Beginner',
-    text: 'How MCX is organised, how gold, silver, and crude are quoted, and how an order is read.',
-    items: ['MCX basics', 'Gold, silver, crude', 'The contract screen'],
+    text: 'How MCX works, how gold, silver and crude oil are priced, and how to read an order.',
+    items: ['MCX basics', 'Gold, silver, crude oil', 'The trading screen'],
   },
   {
+    level: 2,
     title: 'Intermediate',
-    text: 'Analysis methods, product math, and the language of risk.',
+    text: 'Reading charts, what moves prices, and the maths of lots and margin.',
     items: ['Commodity charts', 'What moves prices', 'Lots and margin'],
   },
   {
+    level: 3,
     title: 'Advanced',
-    text: 'Psychology, partner education, and more complete decision checklists.',
-    items: ['Trading psychology', 'IB fundamentals', 'Process journals'],
+    text: 'Trading psychology, risk routines and complete decision checklists.',
+    items: ['Trading psychology', 'Risk routines', 'Trading journals'],
   },
 ]
 
 const why = [
   {
     icon: GraduationCap,
-    title: 'Structured, not scattered',
-    text: 'Courses are sequenced so vocabulary, platform skills, and risk sit in a logical order.',
+    title: 'A clear order to learn in',
+    text: 'Courses build on each other, so you learn the words, the trading screen and risk in a logical sequence instead of from scattered videos.',
   },
   {
     icon: Shield,
-    title: 'Risk-first language',
-    text: 'Leverage, margin, and loss are explained plainly. Nothing here promises a trading result.',
+    title: 'Risk explained first',
+    text: 'Leverage, margin and losses are explained in plain language. Nothing here promises profits.',
   },
   {
     icon: LineChart,
-    title: 'Platform literacy',
-    text: 'The MCX screen is taught as a contract board: symbol, expiry, bid and ask, and the order ticket.',
+    title: 'Learn the real screen',
+    text: 'See how an MCX contract is shown: symbol, expiry, bid and ask, and the order ticket.',
   },
   {
-    icon: Sparkles,
+    icon: Award,
     title: 'Progress you can see',
-    text: 'Enrolment, lesson completion, quizzes, and certificates are tracked in your dashboard.',
+    text: 'Your dashboard tracks courses, completed lessons, quiz results and certificates.',
   },
 ]
 
 const steps = [
-  { step: '01', title: 'Create a free account', text: 'Register with your name, email, mobile, and country.' },
-  { step: '02', title: 'Choose a learning path', text: 'Start with MCX basics or the NSC and MCX comparison, then move to a labelled intermediate topic.' },
-  { step: '03', title: 'Study lessons and notes', text: 'Watch the media placeholder, read the material, and keep private notes.' },
-  { step: '04', title: 'Check understanding', text: 'Pass the quiz at 70% to complete the course and receive a sample certificate.' },
+  { icon: UserPlus, title: 'Create a free account', text: 'Sign up with your name, email and mobile number. It takes about a minute.' },
+  { icon: BookOpen, title: 'Choose a course', text: 'Start with MCX basics, or pick any course that matches what you want to learn.' },
+  { icon: NotebookPen, title: 'Watch the lessons', text: 'Study short lessons, read the notes, and keep your own private notes as you go.' },
+  { icon: Award, title: 'Earn your certificate', text: `Pass the course quiz with ${PASSING_SCORE}% or more and receive your certificate.` },
 ]
 
 const features = [
-  'Educational AI Engine',
-  'Searchable course catalogue',
-  'Category and difficulty filters',
-  'Lesson completion tracking',
-  'Knowledge-check quizzes',
-  'Downloadable lesson resources',
-  'Printable certificates',
+  { icon: Search, label: 'Search and filter courses' },
+  { icon: ListChecks, label: 'Quizzes after every course' },
+  { icon: Download, label: 'Downloadable lesson notes' },
+  { icon: NotebookPen, label: 'Private notes on each lesson' },
+  { icon: Sparkles, label: 'AI study assistant' },
+  { icon: Award, label: 'Printable certificates' },
 ]
+
+function pickShowcase(courses: Course[]) {
+  // Up to three published courses from different categories, so each tile has its own image.
+  const published = courses.filter((course) => course.status === 'published')
+  const ordered = [...published.filter((course) => course.popular), ...published.filter((course) => !course.popular)]
+  const picked: Course[] = []
+  for (const course of ordered) {
+    if (picked.length === 3) break
+    if (!picked.some((item) => item.categoryId === course.categoryId)) picked.push(course)
+  }
+  return picked
+}
 
 export function HomePage() {
   const { courses } = useAcademy()
-  const popular = courses.filter((course) => course.popular).slice(0, 4)
+  const { user } = useAuth()
+  const showcase = pickShowcase(courses)
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(faqs[0]?.id)
+  const freePoints = FREE_QUESTIONS * POINTS_PER_QUESTION
 
   return (
     <>
       <Seo
-        title="Learn MCX and Commodity Markets"
-        description={`${APP_NAME} offers structured education on MCX commodities, the spot market, analysis, and risk. Educational content only.`}
+        title="Learn to Trade Commodities with Expert Guidance"
+        description={`${APP_NAME}: structured courses on gold, silver, crude oil and more, with quizzes, certificates and an AI study assistant. Educational content only.`}
       />
+
+      {/* 1 · Hero */}
       <section className="relative isolate overflow-hidden">
-        <img
-          src="/images/hero-person.jpg"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
-        />
-        <div className="absolute inset-0 bg-linear-to-b from-[#06152b]/80 via-[#06152b]/55 to-[#06152b]/35 lg:hidden" />
-        <div className="absolute inset-0 hidden bg-linear-to-r from-[#06152b] from-[18%] via-[#06152b]/35 via-[42%] to-transparent lg:block" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-[#06152b] to-transparent" />
-        <div className="relative mx-auto flex min-h-[34rem] max-w-7xl items-center px-4 py-16 sm:min-h-[40rem] sm:px-6 sm:py-24 lg:min-h-[46rem]">
+        <img src="/images/hero-person.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-[72%_center]" />
+        <div className="absolute inset-0 bg-linear-to-b from-navy/90 via-navy/70 to-navy/50 lg:hidden" />
+        <div className="absolute inset-0 hidden bg-linear-to-r from-navy from-[20%] via-navy/45 via-[45%] to-transparent lg:block" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-navy to-transparent" />
+        <div className="relative mx-auto flex min-h-[34rem] max-w-7xl items-center px-4 py-16 sm:min-h-[40rem] sm:px-6 sm:py-24 lg:min-h-[44rem]">
           <div className="min-w-0 max-w-xl lg:max-w-2xl">
-            <h1 className="display text-[1.85rem] leading-[1.12] font-semibold text-white sm:text-5xl sm:leading-tight lg:text-[68px] lg:leading-[0.98]">
-              Learn the Markets. <span className="text-gradient">Trade with Greater Understanding.</span>
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-bright" /> Free courses · Certificates · AI study assistant
+            </p>
+            <h1 className="display mt-5 text-[2rem] leading-[1.1] font-semibold text-white sm:text-5xl sm:leading-tight lg:text-[64px] lg:leading-[1.02]">
+              Learn to Trade Commodities <span className="text-gradient">with Expert Guidance</span>
             </h1>
-            <p className="mt-5 max-w-xl text-sm leading-relaxed text-mist/80 sm:text-lg">
-              Build your knowledge of MCX commodities — gold, silver, crude oil, natural gas, and metals — and of the spot market beside those contracts.
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-white/90 sm:text-lg">
+              Join structured courses on gold, silver, crude oil and more, with an AI study assistant to practise what you learn. Create your free account and start today.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/engine')} icon={<Sparkles className="h-4 w-4" />}>
-                Open AI Engine
+              <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(user ? '/dashboard' : '/register')} icon={<UserPlus className="h-4 w-4" />}>
+                {user ? 'Go to your dashboard' : 'Create Free Account'}
               </Button>
               <Button size="lg" className="w-full sm:w-auto" variant="outline" onClick={() => navigate('/courses')} icon={<BookOpen className="h-4 w-4" />}>
                 Explore Courses
               </Button>
             </div>
-            <p className="mt-6 max-w-xl text-xs leading-relaxed text-mist/50">{DISCLAIMER}</p>
+            <Link to="/engine" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:underline">
+              <Sparkles className="h-4 w-4 text-bright" /> Or try the AI Engine
+            </Link>
+            <p className="mt-6 max-w-xl text-xs leading-relaxed text-white/80">{DISCLAIMER}</p>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-navy py-10 text-mist sm:py-16">
-        <div className="mx-auto grid max-w-7xl min-w-0 items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-10">
-          <div>
+      {/* 2 · AI Engine */}
+      <section className="bg-navy py-12 text-mist sm:py-16">
+        <div className="mx-auto grid max-w-7xl min-w-0 items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
+          <Reveal>
             <p className="text-xs font-bold tracking-[0.18em] text-bright uppercase">AI Engine</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">
-              Study charts with an educational assistant
-            </h2>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-mist/75">
-              The engine reads the live TradingView price and answers with a buy or sell call, an entry, a stop, and a target. Five questions are included. A {APP_SHORT_NAME} deposit adds 15% of the amount as questions.
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">An AI study assistant for live markets</h2>
+            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-mist/90">
+              Ask about gold, crude oil, Nifty, Bank Nifty and more. The engine reads live TradingView prices and explains the trend, key levels and risk in plain language, so you learn how a setup is built before you place a trade.
             </p>
+            <div className="mt-5 max-w-xl rounded-2xl border border-white/15 bg-white/5 p-4 text-sm leading-relaxed text-mist/90">
+              <p className="font-semibold text-white">How credits work</p>
+              <p className="mt-1">
+                Your account starts with {freePoints} points: {FREE_QUESTIONS} free questions, at {POINTS_PER_QUESTION} points each. A {APP_SHORT_NAME} deposit adds points worth 15% of the amount. For example, ₹1,000 adds 150 points, enough for 15 more questions.
+              </p>
+            </div>
             <Button className="mt-6" size="lg" onClick={() => navigate('/engine')} icon={<Sparkles className="h-4 w-4" />}>
               Try the AI Engine
             </Button>
-          </div>
-          <div className="glass rounded-[28px] p-6 text-ink">
-            <p className="text-sm font-semibold text-ink">What are we studying today?</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {['Share my screen', 'Upload a chart', "Today's brief", 'Instrument notes'].map((item) => (
-                <p key={item} className="rounded-2xl border border-baazex/15 bg-baazex/5 px-4 py-3 text-sm text-ink">
-                  {item}
-                </p>
-              ))}
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.06] p-5 sm:p-6">
+              <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-baazex px-4 py-3 text-sm text-white">How is gold looking today?</div>
+              <div className="mt-3 max-w-[92%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm leading-relaxed text-ink">
+                <p className="font-semibold">GOLD — MCX Gold</p>
+                <p className="mt-1 text-muted">The engine shows the last TradingView price, today's change and range, then walks through the trend, the level that would prove the idea wrong, and the risk to size for.</p>
+                <p className="mt-2 text-[11px] font-semibold text-accent">Study example · not a trade instruction</p>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                {['Ask about any market', 'Upload a chart', 'Share your screen', "Today's brief"].map((item) => (
+                  <p key={item} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-mist">
+                    {item}
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
-        <SectionHeading
-          kicker="Popular courses"
-          title="Start with a clear foundation"
-          action={<Link to="/courses" className="text-sm font-semibold text-accent">View all courses</Link>}
-        />
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {popular.map((course) => (
-            <CourseCard key={course.id} course={course} />
+      {/* 3 · Courses (single section) */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        <SectionHeading kicker="Courses" title="Start with a clear foundation" text="Free, self-paced courses on MCX commodities, charts, risk and trading psychology." />
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {showcase.map((course, index) => (
+            <Reveal key={course.id} delay={index * 80}>
+              <CourseCard course={course} />
+            </Reveal>
           ))}
         </div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/courses')} icon={<BookOpen className="h-4 w-4" />}>
+            Explore All Courses
+          </Button>
+          {user ? null : (
+            <Button size="lg" variant="secondary" className="w-full sm:w-auto" onClick={() => navigate('/register')}>
+              Create an Account to Enrol
+            </Button>
+          )}
+        </div>
       </section>
 
-      <section className="py-10 sm:py-16">
+      {/* 4 · Learning levels */}
+      <section className="relative overflow-hidden bg-linear-to-b from-baazex/[0.06] to-transparent py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading kicker="Learning levels" title="A path that grows with your knowledge" />
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {levels.map((level) => (
-              <article key={level.title} className="panel rounded-2xl p-6">
-                <p className="text-xs font-bold tracking-[0.16em] text-accent uppercase">{level.title}</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{level.text}</p>
-                <ul className="mt-4 space-y-2">
-                  {level.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm font-medium text-ink">
-                      <CheckCircle2 className="h-4 w-4 text-accent" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </article>
+            {levels.map((level, index) => (
+              <Reveal key={level.title} delay={index * 80}>
+                <article className="relative h-full overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card">
+                  <span aria-hidden className="absolute -top-6 -right-2 font-serif text-[7rem] leading-none font-semibold text-baazex/[0.07]">
+                    {level.level}
+                  </span>
+                  <div className="flex gap-1.5" aria-hidden>
+                    {[1, 2, 3].map((bar) => (
+                      <span key={bar} className={`h-1.5 w-8 rounded-full ${bar <= level.level ? 'bg-baazex' : 'bg-line'}`} />
+                    ))}
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold text-ink">{level.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{level.text}</p>
+                  <ul className="mt-5 space-y-2.5">
+                    {level.items.map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-sm font-medium text-ink">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-baazex" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              </Reveal>
             ))}
           </div>
+          <AccountCta signedIn={Boolean(user)} />
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
-        <SectionHeading kicker={`Why ${APP_NAME}`} title={`Why learn with ${APP_NAME}?`} />
-        <div className="mt-8 grid gap-5 md:grid-cols-2">
-          {why.map((item) => (
-            <article key={item.title} className="panel flex gap-4 rounded-2xl p-6">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-bright/20 bg-white/6 text-accent">
-                <item.icon className="h-5 w-5" />
-              </span>
-              <div>
-                <h3 className="text-lg font-bold text-ink">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{item.text}</p>
-              </div>
-            </article>
+      {/* 5 · Why */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        <SectionHeading kicker={`Why ${APP_NAME}`} title={`Why learn with ${APP_SHORT_NAME}?`} />
+        <div className="mt-8 grid gap-4 md:grid-cols-3 md:grid-rows-2">
+          {why.map((item, index) => (
+            <Reveal key={item.title} delay={index * 60} className={index === 0 ? 'md:row-span-2' : index === 3 ? 'md:col-span-2' : ''}>
+              <article
+                className={
+                  index === 0
+                    ? 'flex h-full flex-col justify-between rounded-3xl bg-navy p-6 text-mist shadow-float sm:p-8'
+                    : 'flex h-full gap-4 rounded-3xl border border-line bg-white p-6 shadow-card'
+                }
+              >
+                <span
+                  className={
+                    index === 0
+                      ? 'grid h-14 w-14 place-items-center rounded-2xl bg-baazex text-white'
+                      : 'grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-baazex/10 text-baazex'
+                  }
+                >
+                  <item.icon className={index === 0 ? 'h-6 w-6' : 'h-5 w-5'} />
+                </span>
+                <div className={index === 0 ? 'mt-10' : ''}>
+                  <h3 className={index === 0 ? 'text-2xl font-semibold text-white' : 'text-lg font-semibold text-ink'}>{item.title}</h3>
+                  <p className={index === 0 ? 'mt-3 text-[15px] leading-relaxed text-mist/90' : 'mt-1.5 text-sm leading-relaxed text-muted'}>{item.text}</p>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
+        <AccountCta signedIn={Boolean(user)} />
       </section>
 
-      <section className="border-y border-white/10 bg-navy py-10 text-mist sm:py-16">
+      {/* 6 · How it works */}
+      <section className="bg-navy py-12 text-mist sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading kicker="How it works" title="Four steps from account to certificate" light />
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
-            {steps.map((item) => (
-              <article key={item.step}>
-                <p className="font-serif text-3xl text-bright">{item.step}</p>
-                <h3 className="mt-3 text-lg font-bold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-mist/70">{item.text}</p>
-              </article>
+          <ol className="relative mt-10 grid gap-8 md:grid-cols-4 md:gap-6">
+            <span aria-hidden className="absolute top-6 right-[12.5%] left-[12.5%] hidden h-0.5 bg-linear-to-r from-baazex via-bright to-baazex md:block" />
+            <span aria-hidden className="absolute top-6 bottom-6 left-6 w-0.5 bg-linear-to-b from-baazex via-bright to-baazex/30 md:hidden" />
+            {steps.map((item, index) => (
+              <li key={item.title} className="relative pl-16 md:pl-0 md:text-center">
+                <Reveal delay={index * 100}>
+                  <span className="absolute top-0 left-0 grid h-12 w-12 place-items-center rounded-full border-4 border-navy bg-baazex text-white shadow-float md:relative md:mx-auto">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <p className="text-xs font-bold tracking-[0.16em] text-bright uppercase md:mt-4">Step {index + 1}</p>
+                  <h3 className="mt-1 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-mist/85">{item.text}</p>
+                </Reveal>
+              </li>
             ))}
-          </div>
+          </ol>
+          <AccountCta signedIn={Boolean(user)} light />
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <div>
-            <SectionHeading kicker="Platform features" title="Built as a learning product, ready for CRM later" />
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+      {/* 7 · Platform features */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <Reveal>
+            <SectionHeading
+              kicker="Platform features"
+              title="Everything you need to learn, in one place"
+              text="Search courses, take quizzes, download lesson notes, and track your progress as you go. Earn a certificate when you finish."
+            />
+            <ul className="mt-6 grid grid-cols-2 gap-3">
               {features.map((feature) => (
-                <li key={feature} className="panel flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-ink">
-                  <Waypoints className="h-4 w-4 text-accent" />
-                  {feature}
+                <li key={feature.label} className="flex items-center gap-2.5 rounded-xl border border-line bg-white px-3 py-3 text-sm font-medium text-ink">
+                  <feature.icon className="h-4 w-4 shrink-0 text-baazex" />
+                  {feature.label}
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="panel rounded-3xl p-6">
-            <p className="text-xs font-bold tracking-[0.16em] text-accent uppercase">Learning progress preview</p>
-            <h3 className="mt-2 text-xl font-bold text-ink">A quieter dashboard for serious study</h3>
-            <p className="mt-2 text-sm text-muted">
-              After you enrol, the student workspace keeps recent courses, completion, and recommended next lessons in one place.
-            </p>
-            <div className="mt-6 space-y-4">
-              <ProgressBar value={72} label="Introduction to MCX" />
-              <ProgressBar value={40} label="MCX Gold, Silver, Crude, and Copper" />
-              <ProgressBar value={18} label="NSC and MCX" />
+            <AccountCta signedIn={Boolean(user)} />
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="rounded-3xl border border-line bg-white p-6 shadow-float sm:p-8">
+              <p className="text-xs font-bold tracking-[0.16em] text-accent uppercase">Your dashboard</p>
+              <h3 className="mt-2 text-xl font-semibold text-ink">Track your learning</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                After you sign up, your dashboard shows the courses you have started, how far you have got, and what to study next.
+              </p>
+              <div className="mt-6 space-y-4">
+                <ProgressBar value={72} label="Introduction to MCX" />
+                <ProgressBar value={40} label="MCX Gold, Silver, Crude, and Copper" />
+                <ProgressBar value={18} label="NSC and MCX" />
+              </div>
+              <p className="mt-4 text-[11px] text-muted">Example progress for illustration.</p>
             </div>
-            <Link to="/register" className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-accent">
-              Create an account to save progress <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="py-10 sm:py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <SectionHeading kicker="Categories" title="Eight focused learning areas" action={<Link to="/categories" className="text-sm font-semibold text-accent">Browse categories</Link>} />
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {categories.map((category) => {
-              const lessonCount = courses
-                .filter((course) => course.categoryId === category.id)
-                .reduce((sum, course) => sum + getLessonCount(course), 0)
-              return <CategoryCard key={category.id} category={category} lessonCount={lessonCount} />
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
+      {/* 8 · FAQ */}
+      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         <SectionHeading kicker="FAQ" title="Frequently asked questions" />
         <div className="mt-8 space-y-3">
-          {faqs.slice(0, 5).map((item) => (
-            <article key={item.id} className="panel overflow-hidden rounded-2xl">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left text-sm font-bold text-ink sm:px-5"
-                onClick={() => setOpenFaq((current) => (current === item.id ? undefined : item.id))}
-              >
-                {item.question}
-              </button>
-              {openFaq === item.id ? <p className="px-5 pb-5 text-sm leading-relaxed text-muted">{item.answer}</p> : null}
-            </article>
-          ))}
+          {faqs.slice(0, 5).map((item) => {
+            const open = openFaq === item.id
+            return (
+              <article key={item.id} className="overflow-hidden rounded-2xl border border-line bg-white">
+                <button
+                  type="button"
+                  aria-expanded={open}
+                  className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left text-sm font-semibold text-ink sm:px-5"
+                  onClick={() => setOpenFaq((current) => (current === item.id ? undefined : item.id))}
+                >
+                  {item.question}
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition ${open ? 'rotate-180' : ''}`} />
+                </button>
+                {open ? <p className="px-4 pb-5 text-sm leading-relaxed text-muted sm:px-5">{item.answer}</p> : null}
+              </article>
+            )
+          })}
         </div>
         <div className="mt-4 text-center">
           <Link to="/faq" className="text-sm font-semibold text-accent">
@@ -284,45 +366,51 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="px-4 pb-10 sm:px-6 sm:pb-16">
+      {/* 9 · Closing CTA */}
+      <section className="px-4 pb-12 sm:px-6 sm:pb-16">
         <div className="gradient-hero mx-auto max-w-7xl overflow-hidden rounded-3xl px-5 py-10 text-center sm:px-6 sm:py-14">
-          <h2 className="text-2xl font-semibold text-white sm:text-4xl">Study the markets with a professional standard of care.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-mist/75">
-            Enrol in {APP_NAME} to follow a structured curriculum. Education first. No profit claims. No personalised advice.
+          <h2 className="text-2xl font-semibold text-white sm:text-4xl">Start your trading education today</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85">
+            Follow a structured, free curriculum at your own pace. Education first. No profit claims. No personal investment advice.
           </p>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/register')}>
-              Create Free Account
+            <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(user ? '/dashboard' : '/register')}>
+              {user ? 'Go to your dashboard' : 'Create Free Account'}
             </Button>
             <Button size="lg" className="w-full sm:w-auto" variant="outline" onClick={() => navigate('/courses')}>
               Explore Courses
             </Button>
           </div>
-          <Disclaimer className="mx-auto mt-8 max-w-3xl text-mist/50" compact />
+          <Disclaimer className="mx-auto mt-8 max-w-3xl text-white/75" compact />
         </div>
       </section>
     </>
   )
 }
 
-function SectionHeading({
-  kicker,
-  title,
-  action,
-  light,
-}: {
-  kicker: string
-  title: string
-  action?: ReactNode
-  light?: boolean
-}) {
+function AccountCta({ signedIn, light = false }: { signedIn: boolean; light?: boolean }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p className={`text-xs font-bold tracking-[0.18em] uppercase ${light ? 'text-bright' : 'text-accent'}`}>{kicker}</p>
-        <h2 className={`mt-2 text-2xl font-semibold tracking-tight sm:text-3xl ${light ? 'text-white' : 'text-ink'}`}>{title}</h2>
-      </div>
-      {action}
+    <div className="mt-8">
+      <Link
+        to={signedIn ? '/courses' : '/register'}
+        className={
+          light
+            ? 'inline-flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-navy hover:bg-mist'
+            : 'inline-flex h-11 items-center gap-2 rounded-xl bg-baazex px-5 text-sm font-semibold text-on-button shadow-float hover:bg-baazex-600'
+        }
+      >
+        {signedIn ? 'View Courses' : 'Create Free Account'} <ArrowRight className="h-4 w-4" />
+      </Link>
+    </div>
+  )
+}
+
+function SectionHeading({ kicker, title, text, light }: { kicker: string; title: string; text?: string; light?: boolean }): ReactNode {
+  return (
+    <div>
+      <p className={`text-xs font-bold tracking-[0.18em] uppercase ${light ? 'text-bright' : 'text-accent'}`}>{kicker}</p>
+      <h2 className={`mt-2 text-2xl font-semibold tracking-tight sm:text-3xl ${light ? 'text-white' : 'text-ink'}`}>{title}</h2>
+      {text ? <p className={`mt-3 max-w-2xl text-[15px] leading-relaxed ${light ? 'text-mist/85' : 'text-muted'}`}>{text}</p> : null}
     </div>
   )
 }

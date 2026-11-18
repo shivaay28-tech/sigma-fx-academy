@@ -34,3 +34,10 @@ export function progressPercent(completed: number, total: number) {
   if (total <= 0) return 0
   return Math.round((completed / total) * 100)
 }
+
+/** Lessons across the published courses of one category. 0 means the category is "Coming soon". */
+export function categoryLessonCount(courses: Course[], categoryId: string) {
+  return courses
+    .filter((course) => course.categoryId === categoryId && course.status === 'published')
+    .reduce((sum, course) => sum + getLessonCount(course), 0)
+}

@@ -63,11 +63,11 @@ export function symbolsInText(text: string, selected?: string) {
   for (const item of SYMBOL_ALIASES) {
     if (item.keys.some((key) => hasAlias(haystack, key))) found.add(item.symbol)
   }
+  const upper = text.toUpperCase()
+  for (const match of upper.match(new RegExp(`\\b(?:${BOARD_CODES})\\b`, 'g')) ?? []) found.add(match)
   if (found.has('NIFTY') && found.has('BANKNIFTY') && /\bbank nifty\b|\bnifty bank\b|\bbanknifty\b/i.test(text)) {
     const withoutBank = haystack.replace(/\bbank nifty\b|\bnifty bank\b|\bbanknifty\b/g, ' ')
     if (!/\bnifty\b/.test(withoutBank)) found.delete('NIFTY')
   }
-  const upper = text.toUpperCase()
-  for (const match of upper.match(new RegExp(`\\b(?:${BOARD_CODES})\\b`, 'g')) ?? []) found.add(match)
   return [...found]
 }

@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn'
 import { Search } from 'lucide-react'
-import type { Difficulty } from '@/types'
+import type { Course, Difficulty } from '@/types'
 import { categories } from '@/data/categories'
 
 export function SearchAndFilters({
@@ -10,6 +10,7 @@ export function SearchAndFilters({
   onCategory,
   difficulty,
   onDifficulty,
+  courses,
 }: {
   query: string
   onQuery: (value: string) => void
@@ -17,8 +18,16 @@ export function SearchAndFilters({
   onCategory: (value: string) => void
   difficulty: Difficulty | 'All'
   onDifficulty: (value: Difficulty | 'All') => void
+  /** When given, categories and levels without published courses are hidden. */
+  courses?: Course[]
 }) {
-  const difficulties: Array<Difficulty | 'All'> = ['All', 'Beginner', 'Intermediate', 'Advanced']
+  const published = courses?.filter((course) => course.status === 'published')
+  const difficulties: Array<Difficulty | 'All'> = (['All', 'Beginner', 'Intermediate', 'Advanced'] as const).filter(
+    (level) => level === 'All' || !published || published.some((course) => course.difficulty === level),
+  )
+  const visibleCategories = categories.filter(
+    (category) => !published || published.some((course) => course.categoryId === category.id),
+  )
 
   return (
     <div className="panel rounded-2xl p-4">
@@ -37,7 +46,7 @@ export function SearchAndFilters({
           <FilterChip active={categoryId === 'all'} onClick={() => onCategory('all')}>
             All categories
           </FilterChip>
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <FilterChip key={category.id} active={categoryId === category.id} onClick={() => onCategory(category.id)}>
               {category.name}
             </FilterChip>

@@ -7,6 +7,8 @@ export interface LiveQuote {
   low: number
   bid: number
   ask: number
+  /** ms epoch when this browser received the quote */
+  fetchedAt?: number
 }
 
 const INDEXES = new Set(['NIFTY', 'BANKNIFTY'])
@@ -27,6 +29,9 @@ export const tradingViewService = {
     })
     if (!response.ok) return [] as LiveQuote[]
     const payload = (await response.json()) as { quotes?: LiveQuote[] }
-    return (payload.quotes ?? []).filter((item) => Number.isFinite(item.close) && item.close > 0)
+    const at = Date.now()
+    return (payload.quotes ?? [])
+      .filter((item) => Number.isFinite(item.close) && item.close > 0)
+      .map((item) => ({ ...item, fetchedAt: at }))
   },
 }

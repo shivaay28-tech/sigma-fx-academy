@@ -1,4 +1,4 @@
-import { APP_SHORT_NAME, COMPANY_HOST, COMPANY_URL, DISCLAIMER } from '@/utils/constants'
+import { APP_SHORT_NAME, COMPANY_HOST, COMPANY_URL, DISCLAIMER, FREE_QUESTIONS, POINTS_PER_QUESTION } from '@/utils/constants'
 import { MonitorSmartphone, Shield } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -8,10 +8,13 @@ export function EngineRail() {
       <p className="text-[10px] font-bold tracking-[0.2em] text-muted uppercase">Academy</p>
       <div className="panel mt-3 rounded-2xl p-4">
         <p className="text-lg font-extrabold text-ink">
-          A directional call from the live TradingView price.
+          Learn how a setup is built, using live TradingView prices.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Bias, entry, stop, and target use the live TradingView close. Results are not guaranteed. Five questions are included. A {APP_SHORT_NAME} deposit adds 15% of the amount as questions.
+          Ask about any market. The engine explains the trend, key levels and risk as a study example, not a trade instruction. Results are not guaranteed.
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-muted">
+          You start with {FREE_QUESTIONS * POINTS_PER_QUESTION} points ({FREE_QUESTIONS} free questions at {POINTS_PER_QUESTION} points each). A {APP_SHORT_NAME} deposit adds points worth 15% of the amount.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
           <div>

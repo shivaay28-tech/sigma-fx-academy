@@ -15,7 +15,7 @@ export function CertificatesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <Seo title="Certificates" description={`Sample completion certificates issued by ${APP_NAME}.`} />
+      <Seo title="Certificates" description={`Completion certificates issued by ${APP_NAME}.`} />
       <h1 className="text-3xl font-extrabold text-ink">Certificates</h1>
       {records.length ? (
         <div className="mt-6 grid gap-4">
@@ -46,7 +46,7 @@ export function CertificatePage() {
   if (!record) {
     return (
       <div className="px-4 py-16">
-        <EmptyState icon={Award} title="Certificate not found" description="Complete a course quiz after finishing the lessons to issue a sample certificate." />
+        <EmptyState icon={Award} title="Certificate not found" description="Complete a course quiz after finishing the lessons to receive your certificate." />
       </div>
     )
   }

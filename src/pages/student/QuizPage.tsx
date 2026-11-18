@@ -83,7 +83,7 @@ export function QuizPage() {
             <h2 className="mt-2 text-4xl font-extrabold text-ink">{score}%</h2>
             <p className="mt-2 text-sm text-muted">
               {score >= PASSING_SCORE
-                ? 'You passed this knowledge check. If every lesson is complete, a sample certificate is issued.'
+                ? 'You passed this knowledge check. If every lesson is complete, your certificate is issued.'
                 : 'A pass requires 70%. Review the explanations and retake when you are ready.'}
             </p>
             <div className="mt-6 space-y-8">

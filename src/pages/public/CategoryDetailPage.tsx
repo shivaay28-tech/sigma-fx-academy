@@ -30,11 +30,26 @@ export function CategoryDetailPage() {
       <Link to="/categories" className="text-sm font-semibold text-accent">
         All categories
       </Link>
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {matches.map((course) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-      </div>
+      {matches.length ? (
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {matches.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-8">
+          <EmptyState
+            icon={BookOpen}
+            title="Coming soon"
+            description={`Lessons for ${category.name} are being prepared. In the meantime, explore the courses that are ready now.`}
+            action={
+              <Link to="/courses" className="inline-flex h-10 items-center rounded-xl bg-baazex px-4 text-sm font-semibold text-on-button">
+                Explore all courses
+              </Link>
+            }
+          />
+        </div>
+      )}
       </div>
     </div>
   )

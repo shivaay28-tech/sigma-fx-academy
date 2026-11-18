@@ -237,6 +237,44 @@ begin
         questions = replace(questions::text, 'MSC', 'NSC')::jsonb
     where title like '%MSC%' or questions::text like '%MSC%';
 
+  -- Sigma: make sure every current category exists, then replace catalogue rows that still carry the
+  -- original forex seed (same ids) with the current MCX seed. Admin-created courses are not touched.
+  for cat in select value from jsonb_array_elements(coalesce(payload->'categories', '[]'::jsonb))
+  loop
+    insert into public.categories (id, slug, name, description, icon, difficulty, estimated_hours)
+    values (cat->>'id', cat->>'slug', cat->>'name', coalesce(cat->>'description', ''), coalesce(cat->>'icon', ''),
+            cat->>'difficulty', coalesce((cat->>'estimatedHours')::int, 0))
+    on conflict (id) do nothing;
+  end loop;
+
+  for course in select value from jsonb_array_elements(coalesce(payload->'courses', '[]'::jsonb))
+  loop
+    update public.courses c
+      set slug = course->>'slug',
+          title = course->>'title',
+          subtitle = coalesce(course->>'subtitle', ''),
+          description = coalesce(course->>'description', ''),
+          category_id = course->>'categoryId',
+          difficulty = course->>'difficulty',
+          duration_hours = coalesce((course->>'durationHours')::numeric, 1),
+          objectives = coalesce(course->'objectives', '[]'::jsonb),
+          popular = coalesce((course->>'popular')::boolean, false),
+          quiz_id = coalesce(course->>'quizId', ''),
+          modules = coalesce(course->'modules', '[]'::jsonb)
+      where c.id = course->>'id'
+        and (c.title ~* '(forex|metatrader|currency pair|pips, lots|introducing broker fundamentals|understanding financial markets|^how buy and sell orders work$|^technical analysis essentials$|^risk management fundamentals$|^fundamental market analysis$)'
+             or c.category_id not in (select x->>'id' from jsonb_array_elements(coalesce(payload->'categories', '[]'::jsonb)) x));
+  end loop;
+
+  for quiz in select value from jsonb_array_elements(coalesce(payload->'quizzes', '[]'::jsonb))
+  loop
+    update public.quizzes q
+      set title = quiz->>'title',
+          questions = coalesce(quiz->'questions', '[]'::jsonb)
+      where q.id = quiz->>'id'
+        and q.title ~* '(forex|metatrader|currency pair|pips|introducing broker fundamentals|financial markets)';
+  end loop;
+
   if exists (select 1 from public.courses limit 1) then
     return;
   end if;

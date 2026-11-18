@@ -63,13 +63,13 @@ export function Header() {
           ) : (
             <>
               <Link to="/login" className="px-3 text-sm font-semibold text-mist/80 hover:text-white">
-                Login
+                Log in
               </Link>
               <Link
                 to="/register"
                 className="inline-flex h-9 items-center rounded-lg bg-baazex px-4 text-sm font-semibold text-on-button shadow-float hover:bg-baazex-600"
               >
-                Start Learning
+                Create Free Account
               </Link>
             </>
           )}
@@ -109,14 +109,14 @@ export function Header() {
               ) : (
                 <>
                   <Link to="/login" onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-semibold text-mist">
-                    Login
+                    Log in
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setOpen(false)}
                     className="rounded-xl bg-baazex px-4 py-3 text-center text-sm font-semibold text-white"
                   >
-                    Start Learning
+                    Create Free Account
                   </Link>
                 </>
               )}

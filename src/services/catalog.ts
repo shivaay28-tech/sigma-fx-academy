@@ -67,11 +67,31 @@ function stillSaysMsc(value: unknown) {
   return text.includes('MSC') || text.includes('msc-')
 }
 
+// The Sigma database was first seeded with the original forex catalogue under the same ids.
+// Rows that still carry that content are replaced by the current MCX seed.
+const LEGACY_MARKERS = ['Forex Trading', 'EUR/USD', 'MetaTrader', 'Currency Pair', 'currency pair', 'Pips, Lots', 'Introducing Broker Fundamentals', 'Understanding Financial Markets', '"How Buy and Sell Orders Work"', '"Technical Analysis Essentials"', '"Risk Management Fundamentals"', '"Fundamental Market Analysis"']
+const knownCategories = new Set(categories.map((item) => item.id))
+
+function isLegacyRow(remote: unknown, seed: unknown) {
+  const remoteText = JSON.stringify(remote)
+  const seedText = JSON.stringify(seed)
+  if (LEGACY_MARKERS.some((marker) => remoteText.includes(marker) && !seedText.includes(marker))) return true
+  const categoryId = (remote as { categoryId?: string }).categoryId
+  return typeof categoryId === 'string' && !knownCategories.has(categoryId)
+}
+
+const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const
+
+function normalizeCourse(course: Course): Course {
+  const level = DIFFICULTIES.find((item) => item.toLowerCase() === String(course.difficulty).trim().toLowerCase())
+  return level && level !== course.difficulty ? { ...course, difficulty: level } : course
+}
+
 function preferCurrentSeed<T extends { id: string }>(remote: T[], seed: T[]) {
   const byId = new Map(seed.map((item) => [item.id, item]))
   const merged = remote.map((item) => {
     const current = byId.get(item.id)
-    return current && stillSaysMsc(item) ? current : item
+    return current && (stillSaysMsc(item) || isLegacyRow(item, current)) ? current : item
   })
   const seen = new Set(remote.map((item) => item.id))
   for (const item of seed) {
@@ -93,7 +113,7 @@ async function fetchCatalog() {
     sb.from('courses').select('*').order('title'),
     sb.from('quizzes').select('*'),
   ])
-  courseCache = preferCurrentSeed((courseRows ?? []).map((row) => mapCourse(asRow(row))), seedCourses)
+  courseCache = preferCurrentSeed((courseRows ?? []).map((row) => normalizeCourse(mapCourse(asRow(row)))), seedCourses)
   quizCache = preferCurrentSeed((quizRows ?? []).map((row) => mapQuiz(asRow(row))), seedQuizzes)
   hydrated = true
 }

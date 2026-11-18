@@ -56,7 +56,7 @@ export function CoursesPage() {
             loading={enrolling}
             onClick={() => {
               if (!user) {
-                navigate('/login', { state: { from: '/courses' } })
+                navigate('/register', { state: { from: '/courses' } })
                 return
               }
               const ids = selected.filter((id) => !isEnrolled(id))
@@ -85,6 +85,7 @@ export function CoursesPage() {
           onCategory={setCategoryId}
           difficulty={difficulty}
           onDifficulty={setDifficulty}
+          courses={courses}
         />
       </div>
       {filtered.length ? (
@@ -109,8 +110,24 @@ export function CoursesPage() {
         <div className="mt-8">
           <EmptyState
             icon={Search}
-            title="No courses match those filters"
-            description="Try a different search term or reset the category and difficulty filters."
+            title={query.trim() ? `Nothing found for “${query.trim()}”` : 'More courses coming soon'}
+            description={
+              query.trim()
+                ? 'Try another word, or browse the full catalogue.'
+                : 'New lessons for this combination are being prepared. Explore the courses that are ready now.'
+            }
+            action={
+              <Button
+                size="sm"
+                onClick={() => {
+                  setQuery('')
+                  setCategoryId('all')
+                  setDifficulty('All')
+                }}
+              >
+                Show all courses
+              </Button>
+            }
           />
         </div>
       )}

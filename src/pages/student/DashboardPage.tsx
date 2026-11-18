@@ -151,7 +151,7 @@ export function DashboardPage() {
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-muted">Complete all lessons and pass the quiz to receive a sample certificate.</p>
+            <p className="mt-3 text-sm text-muted">Complete all lessons and pass the quiz to receive your certificate.</p>
           )}
         </article>
       </div>

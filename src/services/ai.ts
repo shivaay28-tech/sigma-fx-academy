@@ -17,24 +17,31 @@ import {
 } from '@/data/engineKnowledge'
 import type { AiAnswerLength, AiAttachment } from '@/types'
 import { APP_NAME, DISCLAIMER, ENGINE_NAME } from '@/utils/constants'
-import { symbolsInText, TRADING_VIEW_SYMBOLS } from '@/data/tradingView'
+import { formatQuoteTime, resolveFocus, symbolsInText, timeReference, TRADING_VIEW_SYMBOLS } from '@/data/tradingView'
 import { formatLiveQuote, type LiveQuote } from '@/services/tradingView'
 import { inspectAttachments, type ChartRead } from '@/utils/chartRead'
 
-const SYSTEM_RULES = `You are ${ENGINE_NAME}, the product assistant for ${APP_NAME} (NSE cash, MCX commodity futures, sessions in IST, and risk).
+const SYSTEM_RULES = `You are ${ENGINE_NAME}, the study assistant for ${APP_NAME}. You teach how NSE cash and MCX commodity markets work: trend, key levels, sessions in IST, and risk. You are educational only. You never tell the user to buy or sell and never give trade calls or signals.
 
-When the user asks about a market and you have a symbol, a timeframe, and a last price, the first lines of the answer MUST be the call. Do not ask for a chart first.
-- Symbol and timeframe
-- Bias: Buy or Sell. If they did not choose a side, use Buy and say it is the working bias.
-- Entry: the TradingView close number in the live-quote block. Never the bid and never the ask. If they typed their own last price, use that instead.
-- Stop and target, labeled as study examples: Nifty about 40 points stop and 80 points target; Bank Nifty about 80 and 150 points; gold about 150 and 300 rupees; silver about 400 and 800 rupees; crude about 40 and 80 rupees. Do not use pips or forex sessions.
-- One short reason from how that product is quoted, which Indian session matters, and what usually moves it
+Which instrument to answer about:
+- The message states "Answer about: ...". Answer about exactly those instruments. The instrument the user typed always wins over any instrument selected in the app.
+- If it says the question is general (for example "mcx" or "commodities"), answer the general question. Do not switch to an index or a share the user did not ask about.
 
-NIFTY and BANKNIFTY are NSE cash indexes in points. Shares are NSE cash in rupees per share, about 09:15–15:30 IST. GOLD, SILVER, and the other commodities are MCX futures in rupees, about 09:00–23:30 IST. A gold chart is GOLD. A Nifty chart is NIFTY. Never answer with a currency pair.
-A TradingView live quote in the message is the last price. Use that close as the entry and do not ask for a price that is already quoted.
-When a chart image is attached, ignore every other symbol. The first lines MUST be the call for the symbol, timeframe, and last price printed on that chart. A label of 1D means daily. The close printed on the chart is the entry. Do not ask for a symbol, timeframe, or price that is already printed. Do not mention any other symbol.
-If no chart image is attached and the symbol, timeframe, or a live price is missing, ask only for the missing piece and do not invent a quote.
-Do not invent candle prices you cannot see. Results are not guaranteed. Close with one short risk reminder.`
+Live data:
+- Use only the TradingView quotes listed in the message. Each has a last price, today's change, today's high and low, and the time it was fetched. Quote that time when you use a number.
+- If the user asks about a past period (yesterday, last week, last month, a past date) and no data for that period is in the message, say plainly that the engine only has today's live quote and does not have figures for that period. Never estimate, recall or invent past prices.
+- If no quote is listed for the instrument, say the live price did not load. Do not invent one.
+
+How to answer a market question:
+1. One line: what the instrument is and how it is quoted (points for NIFTY/BANKNIFTY, rupees per share for NSE shares, rupees per contract unit for MCX futures).
+2. What today's quote shows: last price, change, and where it sits in today's high–low range.
+3. A worked study example, clearly labelled "Study example — not a trade instruction": the direction being studied, the reference price (the TradingView close, never bid or ask), where the idea would be proved wrong (an example invalidation level), and the next level to watch. Typical study distances: Nifty about 40 / 80 points, Bank Nifty about 80 / 150 points, gold about 150 / 300 rupees, silver about 400 / 800 rupees, crude about 40 / 80 rupees.
+4. One short note on the session (NSE about 09:15–15:30 IST, MCX about 09:00–23:30 IST) and what usually moves it.
+5. One line on risk and position size.
+If no timeframe was given, study the daily picture from today's quote rather than asking for one.
+
+When a chart image is attached, the symbol, timeframe and last price printed on the chart define the study. Describe the visible pattern as educational pattern analysis, say that automated chart reading can be wrong, and do not mention other symbols.
+Never use words like "call", "signal", "buy now" or "sell now". Results are not guaranteed. Close with one short risk reminder.`
 
 export type EngineTopic =
   | 'brief'
@@ -59,6 +66,8 @@ interface AskInput {
   answerLength: AiAnswerLength
   history: Array<{ role: 'user' | 'assistant'; content: string }>
   liveQuotes?: LiveQuote[]
+  /** Instruments resolved from the question; overrides the bottom-bar selection. */
+  focusSymbols?: string[]
   apiKey?: string
   baseUrl?: string
   model?: string
@@ -110,20 +119,30 @@ function chartImageSetsSymbol(input: AskInput) {
   return hasImage && symbolsInText(input.prompt).length === 0
 }
 
+export function isFollowUp(prompt: string, history: AskInput['history']) {
+  return prompt.trim().length < 48 && history.some((item) => item.role === 'assistant')
+}
+
+function focusFor(input: AskInput) {
+  if (input.focusSymbols) return input.focusSymbols
+  return resolveFocus({
+    prompt: input.prompt,
+    selected: input.instrument,
+    prior: previousUserText(input.history, input.prompt),
+    followUp: isFollowUp(input.prompt, input.history),
+  }).symbols
+}
+
 function parseQuestion(input: AskInput) {
   const prior = previousUserText(input.history, input.prompt)
   const hasImage = input.attachments.some((item) => item.kind === 'image')
   const chartLabel = chartImageSetsSymbol(input)
-  const symbols = hasImage
-    ? detectSymbols(input.prompt)
-    : detectSymbols(`${input.prompt} ${input.instrument ?? ''} ${prior}`, input.instrument)
+  const symbols = hasImage ? detectSymbols(input.prompt) : [...focusFor(input)]
   let topics = detectTopics(input.prompt, input.attachments.length > 0)
-  const shortFollowUp = input.prompt.trim().length < 48 && input.history.some((item) => item.role === 'assistant')
+  const shortFollowUp = isFollowUp(input.prompt, input.history)
   if (!chartLabel && (topics.length === 0 || shortFollowUp)) {
     const previous = detectTopics(prior, false)
     for (const topic of previous) topics.push(topic)
-    const previousSymbols = detectSymbols(prior)
-    for (const symbol of previousSymbols) if (!symbols.includes(symbol)) symbols.push(symbol)
   }
   topics = [...new Set(topics)]
   if (topics.length === 0 && symbols.length) topics.push('instrument')
@@ -157,7 +176,7 @@ function detectPrice(text: string) {
   return quotes.at(-1)
 }
 
-function detectBias(text: string, slope?: ChartRead['slope']): 'buy' | 'sell' {
+function detectBias(text: string, slope?: ChartRead['slope'], live?: LiveQuote): 'buy' | 'sell' {
   const haystack = normalize(text)
   const sell = /\b(sell|short|bearish)\b/.test(haystack)
   const buy = /\b(buy|long|bullish)\b/.test(haystack)
@@ -165,6 +184,7 @@ function detectBias(text: string, slope?: ChartRead['slope']): 'buy' | 'sell' {
   if (buy && !sell) return 'buy'
   if (slope === 'lower to the right') return 'sell'
   if (slope === 'higher to the right') return 'buy'
+  if (live) return live.change < 0 ? 'sell' : 'buy'
   return 'buy'
 }
 
@@ -271,25 +291,25 @@ export function formatChartLevels(input: ChartLevelInput) {
   const reason = study
     ? `${study.whatMovesIt} ${instrumentSession(input.symbol) ?? ''}`.trim()
     : 'Stops sit against the bias. Targets sit with the bias.'
+  const time = formatQuoteTime(input.quote.fetchedAt)
   const rate =
     input.rateSource === 'chart'
-      ? `Rate: ${formatLevel(input.symbol, price)}. This is the close printed on the chart. Bid and ask are not the entry.`
-      : `Live rate: ${formatLevel(input.symbol, price)}. Change ${input.quote.change.toFixed(2)}%. This is the TradingView close. Bid and ask are not the entry.`
-  const side = bias === 'buy' ? 'Buy' : 'Sell'
+      ? `Reference price: ${formatLevel(input.symbol, price)} (the close printed on your chart).`
+      : `Reference price: ${formatLevel(input.symbol, price)}, change ${input.quote.change.toFixed(2)}% (source: TradingView${time ? `, fetched ${time}` : ''}).`
+  const direction_ = bias === 'buy' ? 'Upward' : 'Downward'
   return {
     priced: true,
     text: [
-      heading(title || input.symbol),
+      heading(`${title || input.symbol} — chart study`),
+      `The chart reads as sloping ${bias === 'buy' ? 'higher' : 'lower'} to the right. Automated chart reading can be wrong, so check it against your own chart.`,
+      heading('Study example — not a trade instruction'),
       bullets([
         rate,
-        `Bias: ${side}`,
-        `Entry: ${formatLevel(input.symbol, price)}`,
-        `SL1: ${formatLevel(input.symbol, price - direction * distance.stop)}`,
-        `SL2: ${formatLevel(input.symbol, price - direction * distance.stop * 2)}`,
-        `TP1: ${formatLevel(input.symbol, price + direction * distance.target)}`,
-        `TP2: ${formatLevel(input.symbol, price + direction * distance.target * 2)}`,
+        `Direction being studied: ${direction_}`,
+        `Idea proved wrong near: ${formatLevel(input.symbol, price - direction * distance.stop)} (wider: ${formatLevel(input.symbol, price - direction * distance.stop * 2)})`,
+        `Next levels to watch: ${formatLevel(input.symbol, price + direction * distance.target)}, then ${formatLevel(input.symbol, price + direction * distance.target * 2)}`,
       ]),
-      `${input.symbol}${input.timeframe ? ` ${input.timeframe}` : ''} is a ${side.toLowerCase()} study from the swing on the chart. SL1 is the near stop and SL2 is twice as far. TP1 is the near target and TP2 is twice as far. ${reason}`,
+      `These levels use typical study distances for ${input.symbol}, not a forecast. ${reason}`,
       DISCLAIMER,
     ].join('\n\n'),
   }
@@ -351,11 +371,11 @@ function chartSection(reads: ChartRead[], symbols: string[]) {
   return [
     heading(`What the ${reads[0]?.source === 'video' ? 'clip' : 'chart'} shows`),
     ...lines,
-    heading('How the picture sets the bias'),
+    heading('How to read the picture'),
     bullets([
-      `A series that is higher to the right is a buy bias. Lower to the right is a sell bias${symbolText}.`,
-      'The stop belongs beyond the last obvious swing against that bias. The target is the next swing in the direction of the bias.',
-      'When a last price is printed on the chart, that close is the entry.',
+      `A series that is higher to the right is an upward structure. Lower to the right is a downward structure${symbolText}.`,
+      'The idea is proved wrong beyond the last obvious swing against that direction. The next level to watch is the next swing in the direction studied.',
+      'Automated chart reading can be wrong. Treat this as educational pattern analysis and check it against your own chart.',
     ]),
   ].join('\n\n')
 }
@@ -380,13 +400,25 @@ function topicSection(topic: EngineTopic, brief: boolean) {
   return text
 }
 
-function briefSection(symbols: string[]) {
+function briefSection(symbols: string[], quotes: LiveQuote[] = []) {
   const now = new Date()
   const clock = sessionClock(now)
   const watch = symbols.length ? symbols : ['NIFTY', 'BANKNIFTY', 'GOLD']
+  const rows = watch
+    .map((symbol) => quotes.find((item) => item.symbol === symbol && item.close > 0))
+    .filter((item): item is LiveQuote => Boolean(item))
+  const updated = formatQuoteTime(Math.max(0, ...rows.map((item) => item.fetchedAt ?? 0)) || undefined)
   return [
     heading(`Today's study brief — ${weekdayLabel(now)}`),
     `IST clock: ${clock.summary}`,
+    rows.length
+      ? `${heading(`Live snapshot${updated ? ` (TradingView, updated ${updated})` : ' (TradingView)'}`)}\n${bullets(
+          rows.map(
+            (item) =>
+              `${item.symbol}: ${formatLevel(item.symbol, item.close)} (${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%), today's range ${formatLevel(item.symbol, item.low)} – ${formatLevel(item.symbol, item.high)}`,
+          ),
+        )}`
+      : 'Live prices did not load, so no figures are shown. The engine does not invent prices.',
     heading('A practical study loop (no orders required)'),
     bullets([
       `Write three names on a pad: ${watch.join(', ')}. For each, note whether it is an NSE cash index, an NSE share, or an MCX future, and the next print that can affect it.`,
@@ -419,51 +451,64 @@ function oneCall(input: AskInput, symbol: string | undefined, context: string, r
   const live = symbol ? quoteFor(input, symbol) : undefined
   const price = typedPrice ?? live?.close
   const missing = [
-    symbol ? null : 'the symbol (for example NIFTY or GOLD)',
-    timeframe ? null : 'the timeframe (for example H1 or H4)',
+    symbol ? null : 'the market (for example NIFTY or GOLD)',
     price !== undefined ? null : 'the last price — the TradingView quote did not load for this symbol',
   ].filter((item): item is string => Boolean(item))
 
-  if (!symbol || !timeframe || price === undefined) {
+  if (!symbol || price === undefined) {
     return [
-      heading('Need this before a call'),
-      'I will not invent a live quote. Send the missing piece and I will set the bias, entry, stop, and target from it.',
-      bullets(missing),
-    ].join('\n\n')
+      heading(symbol ? `${symbol} — live price not available` : 'Which market?'),
+      symbol
+        ? 'The TradingView quote did not load for this symbol, so no levels are shown. The engine does not invent prices. Try again in a moment.'
+        : 'Name the market you want to study, for example gold, crude oil, Nifty or a share such as RELIANCE.',
+      missing.length > 1 ? bullets(missing) : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n')
   }
 
-  const bias = detectBias(context, reads[0]?.slope)
+  const studyTimeframe = timeframe ?? 'daily'
+  const bias = detectBias(context, reads[0]?.slope, live)
   const distance = levelDistance(symbol, price)
   const direction = bias === 'buy' ? 1 : -1
   const study = INSTRUMENT_STUDY[symbol]
   const reason = study
     ? `${study.whatMovesIt} ${instrumentSession(symbol) ?? ''}`.trim()
-    : 'The stop sits beyond a small invalidation and the target is the next measured move in the direction of the bias.'
-  const source =
+    : 'The invalidation sits beyond a small swing and the next level is the next measured move in the studied direction.'
+  const time = live ? formatQuoteTime(live.fetchedAt) : ''
+  const snapshot =
     typedPrice === undefined && live
-      ? `Entry is the TradingView close for ${live.ticker}.`
-      : ''
+      ? bullets([
+          `Last price: ${formatLevel(symbol, live.close)} (${live.change >= 0 ? '+' : ''}${live.change.toFixed(2)}% today)`,
+          `Today's range: ${formatLevel(symbol, live.low)} – ${formatLevel(symbol, live.high)}`,
+          `Source: TradingView ${live.ticker}${time ? `, fetched ${time}` : ''}`,
+        ])
+      : `Reference price: ${formatLevel(symbol, price)} (the price you typed).`
 
   return [
-    heading(`${symbol} ${timeframe} call`),
+    heading(`${symbol} — ${instrumentName(symbol)}`),
+    snapshot,
+    heading(`Study example (${studyTimeframe}) — not a trade instruction`),
     bullets([
-      `Bias: ${bias}`,
-      `Entry: ${formatLevel(symbol, price)}`,
-      `Stop: ${formatLevel(symbol, price - direction * distance.stop)}`,
-      `Target: ${formatLevel(symbol, price + direction * distance.target)}`,
+      `Direction being studied: ${bias === 'buy' ? 'upward' : 'downward'}${live && typedPrice === undefined ? ` (today's change is ${live.change >= 0 ? 'positive' : 'negative'})` : ''}`,
+      `Reference price: ${formatLevel(symbol, price)}`,
+      `Idea proved wrong near: ${formatLevel(symbol, price - direction * distance.stop)}`,
+      `Next level to watch: ${formatLevel(symbol, price + direction * distance.target)}`,
     ]),
-    source,
-    reason,
-    bias === 'buy' && !/\b(buy|long|bullish)\b/i.test(context) && reads[0]?.slope !== 'higher to the right'
-      ? 'Working bias is buy because this message did not give a sell instruction or a chart sloping lower.'
-      : '',
+    `${reason}${timeframe ? '' : ' Add a timeframe such as H1 or H4 to study a shorter window.'}`,
   ]
     .filter(Boolean)
     .join('\n\n')
 }
 
+function timeSection(prompt: string) {
+  const ref = timeReference(prompt)
+  if (!ref || ref.live) return ''
+  return `${heading(`About “${ref.label}”`)}\nThe engine only has today's live TradingView quote. It does not have verified figures for ${ref.label}, so it will not quote them. Open the chart on TradingView or your broker platform for that period.`
+}
+
 function callSection(input: AskInput, symbols: string[], reads: ChartRead[]) {
-  const context = `${input.prompt} ${input.instrument ?? ''} ${previousUserText(input.history, input.prompt)}`
+  const context = `${input.prompt} ${previousUserText(input.history, input.prompt)}`
   const targets = symbols.slice(0, 3)
   const typedPrice = targets.length === 1 ? detectPrice(context) : undefined
   if (!targets.length) return oneCall(input, undefined, context, reads, typedPrice)
@@ -476,12 +521,15 @@ async function composeReply(input: AskInput) {
   const brief = input.answerLength === 'brief'
   const sections: string[] = [answerLead(input.prompt, parsed.symbols, parsed.followUp)]
 
-  if (marketQuestion(parsed.topics, parsed.symbols)) {
+  sections.push(timeSection(input.prompt))
+
+  const isBrief = parsed.topics.includes('brief') && !reads.length
+  if (!isBrief && marketQuestion(parsed.topics, parsed.symbols)) {
     sections.push(callSection(input, parsed.symbols, reads))
   }
 
-  if (parsed.topics.includes('brief') && !reads.length) {
-    sections.push(briefSection(parsed.symbols))
+  if (isBrief) {
+    sections.push(briefSection(parsed.symbols, input.liveQuotes))
   }
 
   if (reads.length) sections.push(chartSection(reads, parsed.symbols))
@@ -507,7 +555,7 @@ async function composeReply(input: AskInput) {
 
   if (!reads.length && uniqueSymbols.length === 0 && used.size === 0 && !parsed.topics.includes('brief')) {
     sections.push(
-      `${heading('How to study a market question')}\nSend the symbol, the timeframe, and the last price. The call is then bias, entry, stop, and target. Results are not guaranteed.`,
+      `${heading('How to study a market question')}\nName a market (for example gold, crude oil, Nifty or RELIANCE) and, if you like, a timeframe such as H1. The engine reads the live TradingView price and explains the trend, key levels and risk. Results are not guaranteed.`,
     )
   }
 
@@ -523,27 +571,45 @@ function historyWithoutDuplicate(input: AskInput) {
   return history
 }
 
-function quoteBlock(quotes: LiveQuote[] | undefined) {
+function quoteBlock(quotes: LiveQuote[] | undefined, focus: string[]) {
   if (!quotes?.length) return ''
-  const lines = quotes.map(
-    (item) =>
-      `${item.symbol} (${item.ticker}) ENTRY CLOSE ${item.close}. Bid ${item.bid} and ask ${item.ask} are not the entry. Change ${item.change.toFixed(2)}%.`,
-  )
-  return `TradingView live quotes. The entry for each symbol is the ENTRY CLOSE number. Do not use the bid or the ask. Do not ask for a price that is listed here.\n${lines.join('\n')}`
+  const picked = focus.length ? quotes.filter((item) => focus.includes(item.symbol)) : quotes.slice(0, 6)
+  if (!picked.length) return `No TradingView quote loaded for ${focus.join(', ')}. Do not invent a price.`
+  const lines = picked.map((item) => {
+    const time = formatQuoteTime(item.fetchedAt)
+    return `${item.symbol} (${item.ticker}) LAST ${item.close}, change ${item.change.toFixed(2)}% today, today's high ${item.high}, low ${item.low}${time ? `, fetched ${time}` : ''}. Bid ${item.bid} and ask ${item.ask} are not the reference price.`
+  })
+  return `TradingView live quotes (today's session only — no historical data is provided):\n${lines.join('\n')}`
+}
+
+function focusLine(input: AskInput, focus: string[]) {
+  if (focus.length) {
+    const named = symbolsInText(input.prompt)
+    const why = named.length ? 'the user named it in the question' : 'it is the instrument the user is studying'
+    return `Answer about: ${focus.join(', ')} (${why}). Do not answer about any other instrument${input.instrument && !focus.includes(input.instrument) ? `, including ${input.instrument} which is only selected in the app` : ''}.`
+  }
+  return 'The question is general and names no specific instrument. Answer it generally (for example explain MCX or the market asked about). Do not pick an instrument the user did not mention.'
+}
+
+function timeLine(prompt: string) {
+  const ref = timeReference(prompt)
+  if (!ref) return ''
+  if (ref.live) return 'The user asks about today. Use the live quotes above and state their fetch time.'
+  return `The user asks about "${ref.label}". No data for that period is provided. Say clearly that the engine only has today's live quote and does not have verified figures for ${ref.label}. Do not estimate or recall past prices.`
 }
 
 function userContent(input: AskInput, chartNote: string) {
   const images = input.attachments.filter((item) => item.kind === 'image' && item.dataUrl.length < 1_200_000).slice(0, 2)
   const chartLabel = chartImageSetsSymbol(input)
+  const focus = focusFor(input)
   const text = [
-    chartLabel ? '' : quoteBlock(input.liveQuotes),
+    chartLabel ? '' : quoteBlock(input.liveQuotes, focus),
     chartLabel
       ? 'A chart image is attached. The symbol, timeframe, and last price printed on the chart are the ones for this answer. That label wins over every other symbol. A gold chart is GOLD. A Nifty chart is NIFTY. Use the price shown on the chart. Do not analyse a currency pair.'
-      : input.instrument
-        ? `Instrument in focus: ${input.instrument}.`
-        : '',
+      : focusLine(input, focus),
+    chartLabel ? '' : timeLine(input.prompt),
     chartNote,
-    input.attachments.some((item) => item.kind === 'video') ? 'A video clip was attached; treat sampled frames as a structure worksheet.' : '',
+    input.attachments.some((item) => item.kind === 'video') ? 'A short video clip was attached. Describe the chart pattern it shows as educational pattern analysis and say that automated reading can be wrong.' : '',
     `Answer length: ${input.answerLength === 'brief' ? 'concise' : 'thorough but readable'}.`,
     input.prompt,
   ]
